@@ -4,6 +4,8 @@
 ───────────────────────────────────────────*/
 header('Content-Type: application/json');
 
+require_once dirname(__DIR__).'/includes/upload-counter.php';
+
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     http_response_code(405);
     echo json_encode(['ok' => false, 'error' => 'method not allowed']);
@@ -123,6 +125,8 @@ if (file_exists($dest)) {
 if (!move_uploaded_file($file['tmp_name'], $dest)) {
     fail(500, 'cannot move file');
 }
+
+incrementUploadCount();
 
 /*── réponse OK ────────────────────────────*/
 echo json_encode([

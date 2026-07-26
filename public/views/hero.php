@@ -22,6 +22,13 @@
     </a>
     <p class="small text-muted mt-3">Votre session s’efface automatiquement — même si vous oubliez de tout supprimer.</p>
   </div>
+  <div class="upload-counter py-3" aria-label="Nombre de fichiers échangés">
+    <div class="container d-flex justify-content-center align-items-center gap-2">
+      <i class="bi bi-arrow-left-right text-primary" aria-hidden="true"></i>
+      <strong class="upload-counter-value fs-5"><?= number_format($uploadCount, 0, ',', '&nbsp;') ?></strong>
+      <span class="text-muted">fichiers échangés</span>
+    </div>
+  </div>
 </header>
 
 <section class="py-5">

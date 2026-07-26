@@ -4,6 +4,7 @@
 ──────────────────────────────────────────────*/
 define('PHONE2LAPTOP_APP', true);
 include_once	"lib.php";
+require_once __DIR__.'/includes/upload-counter.php';
 // include_once 	'includes/config.php';
 // include_once	'includes/functions.php';
 
@@ -21,6 +22,7 @@ $root        = dirname(__DIR__);
 $uploadsRoot = $root.'/uploads';
 $sessionDir  = $uploadsRoot.'/'.$token;
 @mkdir($sessionDir, 0775, true);
+$uploadCount = readUploadCount();
 
 // ─── purge dossiers expirés
 if (is_dir($uploadsRoot)) {

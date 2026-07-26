@@ -28,6 +28,12 @@
   <style>
     body { scroll-behavior: smooth; }
     .hero { background: #f8f9fa; }
+    .upload-counter {
+      background: #fff;
+      border-top: 1px solid #e9ecef;
+      box-shadow: 0 0.25rem 0.75rem rgba(0, 0, 0, 0.04);
+    }
+    .upload-counter-value { font-variant-numeric: tabular-nums; }
     #file-list img { height: 40px; width: auto; }
     #shared-text { height: 240px; resize: vertical; }
     .step-icon { font-size: 2.5rem; }
