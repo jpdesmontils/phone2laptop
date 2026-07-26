@@ -9,9 +9,9 @@ require_once __DIR__.'/includes/upload-counter.php';
 // include_once	'includes/functions.php';
 
 // ─── paramètres
-$TTL        = 1800;                                   // 30 minutes
 $hasParam   = isset($_GET['token']);
-$token      = $hasParam ? $_GET['token'] : bin2hex(random_bytes(16));
+$token      = $hasParam ? session_token($_GET['token']) : bin2hex(random_bytes(16));
+if (!$token) { http_response_code(400); exit('Session invalide'); }
 $scheme     = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
 $baseUrl    = $scheme.'://'.$_SERVER['HTTP_HOST'].dirname($_SERVER['PHP_SELF']);
 $link       = $baseUrl.'?token='.$token."#share";

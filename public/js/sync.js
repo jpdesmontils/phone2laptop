@@ -1,269 +1,247 @@
-// sync.js – Gestion de la synchronisation fichiers & notes
 (function () {
   'use strict';
 
-  // Vérification que les variables nécessaires sont présentes
-  if (!window.P2L || !window.P2L.token || !window.P2L.apiBase) {
-    console.error('Configuration manquante : window.P2L non définie correctement.');
-    return;
+  const config = window.P2L;
+  const encoder = new TextEncoder();
+  const decoder = new TextDecoder();
+  const elements = {
+    list: document.getElementById('file-list'),
+    text: document.getElementById('shared-text'),
+    copy: document.getElementById('btn-copy'),
+    delete: document.getElementById('btn-delete'),
+    input: document.getElementById('file-input'),
+    progress: document.getElementById('upload-progress'),
+    progressBar: document.getElementById('progress-bar'),
+    countdown: document.getElementById('expiry-countdown'),
+    expiryLabel: document.getElementById('expiry-label'),
+    qr: document.getElementById('session-qr')
+  };
+  if (!config || Object.values(elements).some(element => !element)) return;
+
+  function encodeBase64Url(bytes) {
+    let binary = '';
+    bytes.forEach(byte => { binary += String.fromCharCode(byte); });
+    return btoa(binary).replaceAll('+', '-').replaceAll('/', '_').replace(/=+$/, '');
   }
 
-  const { token, apiBase, baseUrl } = window.P2L;
-
-  // === Éléments DOM ===
-  const listEl = document.getElementById('file-list');
-  const txtField = document.getElementById('shared-text');
-  const btnCopy = document.getElementById('btn-copy');
-  const btnDelete = document.getElementById('btn-delete');
-  const fileInput = document.getElementById('file-input');
-  const uploadProgress = document.getElementById('upload-progress');
-  const progressBar = document.getElementById('progress-bar');
-
-  if (!listEl || !txtField || !btnCopy || !btnDelete || !fileInput) {
-    console.warn('Certains éléments requis sont absents. sync.js ignoré.');
-    return;
+  function decodeBase64Url(value) {
+    const binary = atob(value.replaceAll('-', '+').replaceAll('_', '/') + '==='.slice((value.length + 3) % 4));
+    return Uint8Array.from(binary, char => char.charCodeAt(0));
   }
 
-  // === État local ===
-  let txtCache = '';
-  let lastContent = '';
-
-  // === Utilitaires ===
-  function formatFileSize(bytes) {
-    return Math.round(bytes / 1024) + ' Ko';
+  async function sessionKey() {
+    const params = new URLSearchParams(location.hash.slice(1));
+    let encodedKey = params.get('key');
+    if (!encodedKey) {
+      encodedKey = encodeBase64Url(crypto.getRandomValues(new Uint8Array(32)));
+      params.set('key', encodedKey);
+      params.set('share', '');
+      history.replaceState(null, '', `${location.pathname}${location.search}#${params}`);
+    }
+    const rawKey = decodeBase64Url(encodedKey);
+    if (rawKey.length !== 32) throw new Error('Clé de session invalide');
+    return { encodedKey, key: await crypto.subtle.importKey('raw', rawKey, 'AES-GCM', false, ['encrypt', 'decrypt']) };
   }
 
-  function getFileIcon(ext) {
-    const iconMap = {
-      pdf: 'bi-file-earmark-pdf text-danger',
-      doc: 'bi-file-earmark-word text-primary',
-      docx: 'bi-file-earmark-word text-primary',
-      xls: 'bi-file-earmark-excel text-success',
-      xlsx: 'bi-file-earmark-excel text-success',
-      ppt: 'bi-file-earmark-ppt text-warning',
-      pptx: 'bi-file-earmark-ppt text-warning',
-      txt: 'bi-file-earmark-text text-secondary',
-      zip: 'bi-file-earmark-zip text-info',
-      rar: 'bi-file-earmark-zip text-info',
-      '7z': 'bi-file-earmark-zip text-info'
-    };
-    return iconMap[ext] || 'bi-file-earmark';
+  async function encryptBytes(key, clearBytes) {
+    const iv = crypto.getRandomValues(new Uint8Array(12));
+    const encrypted = new Uint8Array(await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, key, clearBytes));
+    const result = new Uint8Array(iv.length + encrypted.length);
+    result.set(iv);
+    result.set(encrypted, iv.length);
+    return result;
   }
 
-  // === Rendu de la liste de fichiers ===
-  function renderList(files) {
-    listEl.innerHTML = '';
-    const imageExts = new Set(['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp', 'svg']);
+  async function decryptBytes(key, encryptedBytes) {
+    const bytes = new Uint8Array(encryptedBytes);
+    return new Uint8Array(await crypto.subtle.decrypt({ name: 'AES-GCM', iv: bytes.slice(0, 12) }, key, bytes.slice(12)));
+  }
 
-    files.forEach(f => {
-      const lowerName = f.name.toLowerCase();
-      const ext = lowerName.split('.').pop();
+  function packFile(file, bytes) {
+    const metadata = encoder.encode(JSON.stringify({ name: file.name, type: file.type || 'application/octet-stream' }));
+    const packed = new Uint8Array(4 + metadata.length + bytes.byteLength);
+    new DataView(packed.buffer).setUint32(0, metadata.length);
+    packed.set(metadata, 4);
+    packed.set(new Uint8Array(bytes), 4 + metadata.length);
+    return packed;
+  }
 
-      let previewHtml = '';
-      if (imageExts.has(ext)) {
-        previewHtml = `<img src="${f.url}" alt="Miniature" class="img-thumbnail" style="width:40px; height:40px; object-fit:cover;">`;
-      } else {
-        const iconClass = getFileIcon(ext);
-        previewHtml = `<a href="${f.url}" class="bi ${iconClass}" style="font-size: 1.5rem;"></a>`;
+  function unpackFile(bytes) {
+    const metadataLength = new DataView(bytes.buffer, bytes.byteOffset, 4).getUint32(0);
+    const metadata = JSON.parse(decoder.decode(bytes.slice(4, 4 + metadataLength)));
+    return { ...metadata, content: bytes.slice(4 + metadataLength) };
+  }
+
+  async function api(url, options) {
+    const response = await fetch(url, options);
+    if (!response.ok) throw new Error(response.status === 410 ? 'Cette session a expiré.' : `Erreur serveur (${response.status})`);
+    return response;
+  }
+
+  function addFileRow(file) {
+    const item = document.createElement('li');
+    item.className = 'list-group-item d-flex justify-content-between align-items-center gap-3';
+    const label = document.createElement('div');
+    label.className = 'flex-grow-1 text-truncate';
+    const name = document.createElement('div');
+    name.className = 'fw-medium';
+    name.textContent = file.name;
+    const size = document.createElement('small');
+    size.className = 'text-muted';
+    size.textContent = `${Math.round(file.content.byteLength / 1024)} Ko`;
+    label.append(name, size);
+    const download = document.createElement('button');
+    download.className = 'btn btn-sm btn-outline-primary';
+    download.type = 'button';
+    download.textContent = '↓';
+    download.setAttribute('aria-label', `Télécharger ${file.name}`);
+    download.addEventListener('click', () => {
+      const url = URL.createObjectURL(new Blob([file.content], { type: file.type }));
+      const anchor = document.createElement('a');
+      anchor.href = url;
+      anchor.download = file.name;
+      anchor.click();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    });
+    item.append(label, download);
+    elements.list.append(item);
+  }
+
+  async function refreshFiles(key) {
+    const response = await api(`${config.apiBase}files.php?token=${encodeURIComponent(config.token)}`);
+    const expiresAt = response.headers.get('X-Session-Expires-At');
+    config.expiresAt = expiresAt ? Number(expiresAt) : null;
+    const files = await response.json();
+    elements.list.replaceChildren();
+    for (const remote of files) {
+      try {
+        const encrypted = await (await api(remote.url)).arrayBuffer();
+        addFileRow(unpackFile(await decryptBytes(key, encrypted)));
+      } catch (error) {
+        console.error('Fichier chiffré illisible :', remote.id, error);
       }
+    }
+  }
 
-      const li = document.createElement('li');
-      li.className = 'list-group-item d-flex justify-content-between align-items-center gap-3';
-      li.innerHTML = `
-        <div class="d-flex align-items-center gap-2 flex-grow-1">
-          ${previewHtml}
-          <div class="flex-grow-1 text-truncate">
-            <div class="fw-medium">${f.name}</div>
-            <small class="text-muted">${formatFileSize(f.size)}</small>
-          </div>
-        </div>
-        <a class="btn btn-sm btn-outline-primary" href="${f.url}" download>↓</a>
-      `;
-      listEl.appendChild(li);
+  let lastText = '';
+  async function loadText(key) {
+    const payload = await (await api(`${config.apiBase}text.php?token=${encodeURIComponent(config.token)}`)).json();
+    if (!payload.ciphertext) return;
+    const clearText = decoder.decode(await decryptBytes(key, decodeBase64Url(payload.ciphertext)));
+    if (clearText !== lastText) {
+      lastText = clearText;
+      elements.text.value = clearText;
+    }
+  }
+
+  async function saveText(key) {
+    const clearText = elements.text.value;
+    if (clearText === lastText) return;
+    const ciphertext = encodeBase64Url(await encryptBytes(key, encoder.encode(clearText)));
+    await api(`${config.apiBase}text.php`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token: config.token, ciphertext })
+    });
+    lastText = clearText;
+  }
+
+  async function uploadFile(key, file) {
+    const encrypted = await encryptBytes(key, packFile(file, await file.arrayBuffer()));
+    const data = new FormData();
+    data.append('token', config.token);
+    const id = typeof crypto.randomUUID === 'function'
+      ? crypto.randomUUID()
+      : 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, character => {
+          const random = crypto.getRandomValues(new Uint8Array(1))[0] & 15;
+          return (character === 'x' ? random : (random & 3) | 8).toString(16);
+        });
+    data.append('file', new Blob([encrypted], { type: 'application/octet-stream' }), `${id}.enc`);
+    const response = await api(`${config.apiBase}upload.php`, { method: 'POST', body: data });
+    const result = await response.json();
+    config.expiresAt = result.expiresAt;
+  }
+
+  async function deleteSession() {
+    await api(`${config.apiBase}close.php`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token: config.token, action: 'delete' })
+    });
+    elements.list.replaceChildren();
+    elements.text.value = '';
+  }
+
+  function startCountdown() {
+    let deletionRequested = false;
+    const update = async () => {
+      if (config.expiresAt === null) {
+        elements.expiryLabel.hidden = false;
+        elements.countdown.textContent = '';
+        return;
+      }
+      elements.expiryLabel.hidden = true;
+      const remaining = Math.max(0, config.expiresAt - Date.now());
+      const totalSeconds = Math.ceil(remaining / 1000);
+      const minutes = Math.floor(totalSeconds / 60);
+      const seconds = totalSeconds % 60;
+      elements.countdown.textContent = `${minutes} min ${String(seconds).padStart(2, '0')} s`;
+      if (remaining === 0 && !deletionRequested) {
+        deletionRequested = true;
+        try { await deleteSession(); } catch (error) { console.error(error); }
+        elements.input.disabled = true;
+        elements.text.disabled = true;
+        elements.countdown.textContent = 'session expirée';
+      }
+    };
+    update();
+    setInterval(update, 1000);
+  }
+
+  async function initialize() {
+    const { encodedKey, key } = await sessionKey();
+    const shareUrl = `${config.shareUrl}#key=${encodeURIComponent(encodedKey)}&share=`;
+    if (typeof QRCode === 'function') {
+      new QRCode(elements.qr, { text: shareUrl, width: 180, height: 180, correctLevel: QRCode.CorrectLevel.M });
+    } else {
+      elements.qr.textContent = 'QR Code indisponible';
+      console.error('Le générateur de QR Code est indisponible.');
+    }
+    startCountdown();
+    await Promise.all([refreshFiles(key), loadText(key)]);
+    setInterval(() => Promise.all([refreshFiles(key), loadText(key)]).catch(console.error), 2000);
+
+    let typingTimer;
+    elements.text.addEventListener('input', () => {
+      clearTimeout(typingTimer);
+      typingTimer = setTimeout(() => saveText(key).catch(console.error), 500);
+    });
+    const sendFiles = async files => {
+      if (files.length === 0) return;
+      elements.progressBar.style.width = '0%';
+      elements.progress.style.display = 'block';
+      try {
+        for (let index = 0; index < files.length; index++) {
+          await uploadFile(key, files[index]);
+          elements.progressBar.style.width = `${Math.round(((index + 1) / files.length) * 100)}%`;
+        }
+        await refreshFiles(key);
+      } catch (error) { alert(`❌ Erreur : ${error.message}`); }
+      finally { elements.progress.style.display = 'none'; elements.input.value = ''; }
+    };
+    elements.input.addEventListener('change', event => sendFiles(Array.from(event.target.files)));
+    const uploadForm = elements.input.closest('form');
+    uploadForm.addEventListener('dragover', event => event.preventDefault());
+    uploadForm.addEventListener('drop', event => {
+      event.preventDefault();
+      sendFiles(Array.from(event.dataTransfer.files));
+    });
+    elements.copy.addEventListener('click', () => navigator.clipboard.writeText(elements.text.value));
+    elements.delete.addEventListener('click', async () => {
+      if (confirm('Êtes-vous sûr de vouloir tout supprimer ?')) await deleteSession();
     });
   }
 
-  // === Requêtes API ===
-  async function refreshFiles() {
-    try {
-      const res = await fetch(`${apiBase}files.php?token=${encodeURIComponent(token)}`);
-      if (!res.ok) throw new Error('Erreur lors du chargement des fichiers');
-      const files = await res.json();
-      renderList(files);
-    } catch (err) {
-      console.error('refreshFiles:', err);
-    }
-  }
-
-  async function refreshText() {
-    try {
-      const res = await fetch(`${apiBase}text.php?token=${encodeURIComponent(token)}`);
-      if (!res.ok) throw new Error('Erreur lors du chargement du texte');
-      const data = await res.json();
-      if (data.text !== undefined && data.text !== txtCache) {
-        txtCache = data.text;
-        txtField.value = data.text;
-      }
-    } catch (err) {
-      console.error('refreshText:', err);
-    }
-  }
-
-  // === Upload de fichiers avec progression ===
-  fileInput.addEventListener('change', async (e) => {
-    const files = e.target.files;
-    if (files.length === 0) return;
-
-    let uploadedSize = 0;
-    const totalSize = Array.from(files).reduce((sum, f) => sum + f.size, 0);
-
-    // Réinitialiser la barre
-    progressBar.style.width = '0%';
-    uploadProgress.style.display = 'block';
-
-    const uploadFile = (file) => {
-      return new Promise((resolve, reject) => {
-        const xhr = new XMLHttpRequest();
-        const fd = new FormData();
-        fd.append('token', token);
-        fd.append('file', file);
-
-        xhr.open('POST', apiBase + 'upload.php');
-
-        xhr.upload.onprogress = (event) => {
-          if (event.lengthComputable) {
-            const totalUploaded = uploadedSize + event.loaded;
-            const percent = Math.min(100, Math.round((totalUploaded / totalSize) * 100));
-            progressBar.style.width = percent + '%';
-          }
-        };
-
-        xhr.onload = () => {
-          if (xhr.status >= 200 && xhr.status < 300) {
-            try {
-              const res = JSON.parse(xhr.responseText);
-              if (res && res.ok) {
-                uploadedSize += file.size;
-                resolve();
-              } else {
-                reject(new Error(res.error || 'Erreur serveur'));
-              }
-            } catch {
-              reject(new Error('Réponse invalide'));
-            }
-          } else {
-            reject(new Error(`HTTP ${xhr.status}`));
-          }
-        };
-
-        xhr.onerror = () => reject(new Error('Connexion perdue'));
-        xhr.send(fd);
-      });
-    };
-
-    try {
-      for (const file of files) {
-        await uploadFile(file);
-      }
-      await refreshFiles();
-    } catch (err) {
-      alert('❌ Erreur : ' + err.message);
-    } finally {
-      uploadProgress.style.display = 'none';
-      e.target.value = ''; // reset input
-    }
+  initialize().catch(error => {
+    console.error(error);
+    alert(`Impossible d’ouvrir la session chiffrée : ${error.message}`);
   });
-
-  // === Synchronisation texte (polling + debounce) ===
-  async function loadText() {
-    try {
-      const res = await fetch(`${apiBase}text.php?token=${encodeURIComponent(token)}`);
-      const data = await res.json();
-      if (data.text !== undefined && data.text !== lastContent) {
-        lastContent = data.text;
-        txtField.value = data.text;
-      }
-    } catch (err) {
-      console.error('loadText polling:', err);
-    }
-  }
-
-  let typingTimer;
-  txtField.addEventListener('input', () => {
-    clearTimeout(typingTimer);
-    typingTimer = setTimeout(saveText, 500);
-  });
-
-  async function saveText() {
-    const content = txtField.value;
-    if (content === lastContent) return;
-    lastContent = content;
-
-    try {
-      await fetch(apiBase + 'text.php', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ token, text: content })
-      });
-    } catch (err) {
-      console.error('saveText:', err);
-    }
-  }
-
-  // Démarrer le polling
-  loadText();
-  setInterval(loadText, 2000);
-
-  // === Copier le texte ===
-  btnCopy.addEventListener('click', async () => {
-    const text = txtField.value.trim();
-    if (!text) return;
-
-    try {
-      await navigator.clipboard.writeText(text);
-      const originalHTML = btnCopy.innerHTML;
-      btnCopy.innerHTML = '<i class="bi bi-check2"></i> Copié !';
-      btnCopy.classList.replace('btn-outline-secondary', 'btn-outline-success');
-      setTimeout(() => {
-        btnCopy.innerHTML = originalHTML;
-        btnCopy.classList.replace('btn-outline-success', 'btn-outline-secondary');
-      }, 1500);
-    } catch (err) {
-      alert('Impossible de copier. Veuillez sélectionner et copier manuellement.');
-    }
-  });
-
-  // === Tout supprimer ===
-  btnDelete.addEventListener('click', async () => {
-    if (!confirm('Êtes-vous sûr de vouloir tout supprimer ?')) return;
-
-    try {
-      await fetch(apiBase + 'close.php', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ token, action: 'delete' })
-      });
-      listEl.innerHTML = '';
-      txtField.value = '';
-      txtCache = '';
-      lastContent = '';
-    } catch (err) {
-      console.error('Suppression échouée:', err);
-    }
-  });
-
-  // === Initialisation ===
-  refreshFiles();
-  refreshText();
-
-  // Optionnel : EventSource (SSE) si tu veux remplacer le polling
-  /*
-  const es = new EventSource(`${baseUrl}/stream.php?token=${encodeURIComponent(token)}`);
-  es.onmessage = () => {
-    refreshFiles();
-    refreshText();
-  };
-  es.onerror = (err) => console.warn('SSE error:', err);
-  */
-
 })();
