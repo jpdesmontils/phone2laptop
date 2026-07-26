@@ -1,29 +1,23 @@
 <?php
-/* API texte partagé : GET → {text}, POST → enregistre */
+require_once dirname(__DIR__) . '/includes/session.php';
 header('Content-Type: application/json');
+
 $method = $_SERVER['REQUEST_METHOD'];
-
-$input  = ($method === 'GET') ? $_GET : json_decode(file_get_contents('php://input'), true);
-$token  = preg_replace('/[^a-f0-9]/','', $input['token'] ?? '');
-if (!$token) { http_response_code(400); exit; }
-
-$root   = dirname(__DIR__, 2);
-$dir    = $root.'/uploads/'.$token;
-if (!is_dir($dir)) @mkdir($dir, 0775, true);
-$file   = $dir.'/bloc-notes.txt';
+$input = $method === 'GET' ? $_GET : json_decode((string) file_get_contents('php://input'), true);
+$token = session_token($input['token'] ?? '');
+if (!$token) json_error(400, 'Token invalide');
+$session = open_session($token);
+if (!$session) json_error(410, 'Session expirée');
+$file = $session['dir'] . '/notes.enc';
 
 if ($method === 'GET') {
-    echo json_encode(['text'=> file_exists($file) ? file_get_contents($file) : '']);
+    echo json_encode(['ciphertext' => is_file($file) ? file_get_contents($file) : '']);
     exit;
 }
-
-if ($method === 'POST') {
-    $text = $input['text'] ?? '';
-    // On limite à 20 000 caractères pour éviter les abus
-    if (mb_strlen($text) > 20000) { http_response_code(413); exit; }
-    file_put_contents($file, $text, LOCK_EX);
-    echo json_encode(['ok'=>true]);
-    exit;
+if ($method !== 'POST') json_error(405, 'Méthode non autorisée');
+$ciphertext = $input['ciphertext'] ?? '';
+if (!is_string($ciphertext) || strlen($ciphertext) > 40000 || !preg_match('/^[A-Za-z0-9_-]*$/', $ciphertext)) {
+    json_error(413, 'Contenu chiffré invalide ou trop volumineux');
 }
-
-http_response_code(405);
+if (file_put_contents($file, $ciphertext, LOCK_EX) === false) json_error(500, 'Écriture impossible');
+echo json_encode(['ok' => true]);

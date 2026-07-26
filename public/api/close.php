@@ -1,4 +1,5 @@
 <?php
+require_once dirname(__DIR__) . '/includes/session.php';
 
 // Autoriser uniquement les requêtes POST
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -37,7 +38,7 @@ if (json_last_error() !== JSON_ERROR_NONE) {
     exit;
 }
 
-$token = preg_replace('/[^a-f0-9]/', '', $payload['token'] ?? '');
+$token = session_token($payload['token'] ?? '');
 $action = $payload['action'] ?? 'delete';
 
 if (!$token || strlen($token) < 32) {
@@ -47,8 +48,7 @@ if (!$token || strlen($token) < 32) {
     exit;
 }
 
-$root = dirname(__DIR__, 2);
-$dir  = $root . '/uploads/' . $token;
+$dir = session_dir($token);
 
 if (!is_dir($dir)) {
     http_response_code(404);
@@ -87,19 +87,7 @@ switch ($action) {
         break;
 
     case 'delete':
-        $entries = array_merge(glob($dir . '/*') ?: [], glob($dir . '/.*') ?: []);
-        foreach ($entries as $file) {
-            $name = basename($file);
-            if ($name === '.' || $name === '..') continue;
-
-            if (is_file($file) && !unlink($file)) {
-                http_response_code(500);
-                header('Content-Type: application/json');
-                echo json_encode(['error' => 'Impossible de supprimer tous les fichiers']);
-                exit;
-            }
-        }
-        if (!rmdir($dir)) {
+        if (!delete_session_directory($dir)) {
             http_response_code(500);
             header('Content-Type: application/json');
             echo json_encode(['error' => 'Impossible de supprimer la session']);
