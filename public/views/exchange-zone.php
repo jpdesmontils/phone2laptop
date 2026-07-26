@@ -154,6 +154,10 @@ document.addEventListener('DOMContentLoaded', function () {
 
               // ✅ Validation de sécurité : on n'ouvre que les URLs HTTP/HTTPS
               if (isValidHttpUrl(url)) {
+                // Option 1 : Redirection automatique (décommente si souhaité)
+                // window.location.href = url;
+
+                // Option 2 : Ouvrir dans un nouvel onglet (recommandé pour la sécurité UX)
                 window.open(url, '_blank');
 
                 // Arrêter le scan et fermer la caméra
@@ -290,6 +294,17 @@ const apiBase = "<?= $baseUrl ?>/api/";
 
 /* ---------- fichiers ---------- */
 const listEl = document.getElementById('file-list');
+function renderList_old(files){
+  listEl.innerHTML = '';
+  files.forEach(f=>{
+    const li = document.createElement('li');
+    li.className = 'list-group-item d-flex justify-content-between align-items-center';
+    li.innerHTML =
+      `<span>${f.name} <span class="badge bg-secondary">${Math.round(f.size/1024)} Ko</span></span>
+       <a class="btn btn-sm btn-outline-primary" href="${f.url}" download>↓</a>`;
+    listEl.appendChild(li);
+  });
+}
 function renderList(files){
   listEl.innerHTML = '';
   files.forEach(f => {
@@ -373,6 +388,7 @@ document.getElementById('file-input').addEventListener('change', e => {
   progressBar.style.width = '0%';
   progressContainer.style.display = 'block';
 
+  let uploadedCount = 0;
   let totalSize = 0;
   let uploadedSize = 0;
 
@@ -405,6 +421,7 @@ document.getElementById('file-input').addEventListener('change', e => {
             const res = JSON.parse(xhr.responseText);
             if (res && res.ok) {
               uploadedSize += file.size;
+              uploadedCount++;
               resolve();
             } else {
               reject(new Error(res.error || 'Erreur serveur'));
@@ -473,26 +490,14 @@ document.getElementById('btn-copy').addEventListener('click', async () => {
 
 /* ---------- tout supprimer ---------- */
 document.getElementById('btn-delete').addEventListener('click', async ()=>{
-  if (!confirm('Êtes-vous sûr de vouloir tout supprimer ?')) return;
-
-  try {
-    const response = await fetch(apiBase+'close.php', {
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({token,action:'delete'})
-    });
-    const result = await response.json();
-    if (!response.ok || !result.ok) {
-      throw new Error(result.error || `Erreur HTTP ${response.status}`);
-    }
-    listEl.innerHTML = '';
-    txtField.value   = '';
-    txtCache         = '';
-    lastContent      = '';
-  } catch (error) {
-    console.error('Suppression échouée :', error);
-    alert('La suppression a échoué : ' + error.message);
-  }
+  await fetch(apiBase+'close.php', {
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({token,action:'delete'})
+  });
+  listEl.innerHTML = '';
+  txtField.value   = '';
+  txtCache         = '';
 });
 </script>
 <?php endif; ?>

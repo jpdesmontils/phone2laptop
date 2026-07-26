@@ -15,6 +15,15 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
+  <!-- Favicon et PWA -->
+  <!-- 
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/icones/icon-32x32.png">
+  <link rel="icon" type="image/png" sizes="64x64" href="/assets/icones/icon-64x64.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="/assets/icones/icon-192x192.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/assets/icones/icon-180x180.png">
+  <link rel="manifest" href="/manifest.json">
+  -->
+
   <!-- Styles personnalisés -->
   <style>
     body { scroll-behavior: smooth; }
