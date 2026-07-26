@@ -3,20 +3,36 @@
   phone2laptop – landing + zone d’échange (SSE)
 ──────────────────────────────────────────────*/
 define('PHONE2LAPTOP_APP', true);
-require_once __DIR__ . '/includes/session.php';
+include_once	"lib.php";
+require_once __DIR__.'/includes/upload-counter.php';
+// include_once 	'includes/config.php';
+// include_once	'includes/functions.php';
 
 // ─── paramètres
 $hasParam   = isset($_GET['token']);
 $token      = $hasParam ? session_token($_GET['token']) : bin2hex(random_bytes(16));
 if (!$token) { http_response_code(400); exit('Session invalide'); }
 $scheme     = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
-$basePath   = rtrim(dirname($_SERVER['PHP_SELF']), '/');
-$baseUrl    = $scheme.'://'.$_SERVER['HTTP_HOST'].$basePath;
-$link       = $baseUrl.'?token='.$token;
-purge_expired_sessions();
-$session = open_session($token, !$hasParam);
-if (!$session) { http_response_code(410); exit('Cette session a expiré.'); }
-$expiresAt = $session['expiresAt'];
+$baseUrl    = $scheme.'://'.$_SERVER['HTTP_HOST'].dirname($_SERVER['PHP_SELF']);
+$link       = $baseUrl.'?token='.$token."#share";
+$qrUrl      = 'https://api.qrserver.com/v1/create-qr-code/?size=150x150&data='.urlencode($link);
+
+// ─── dossiers
+$root        = dirname(__DIR__);
+$uploadsRoot = $root.'/uploads';
+$sessionDir  = $uploadsRoot.'/'.$token;
+@mkdir($sessionDir, 0775, true);
+$uploadCount = readUploadCount();
+
+// ─── purge dossiers expirés
+if (is_dir($uploadsRoot)) {
+    foreach (glob($uploadsRoot.'/*') as $d) {
+        if (is_dir($d) && (time() - filemtime($d) > $TTL)) {
+            array_map('unlink', glob($d.'/*'));
+            @rmdir($d);
+        }
+    }
+}
 
 // render();
 // ─── Inclusion des vues
