@@ -10,7 +10,8 @@ $hasParam   = isset($_GET['token']);
 $token      = $hasParam ? session_token($_GET['token']) : bin2hex(random_bytes(16));
 if (!$token) { http_response_code(400); exit('Session invalide'); }
 $scheme     = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
-$baseUrl    = $scheme.'://'.$_SERVER['HTTP_HOST'].dirname($_SERVER['PHP_SELF']);
+$basePath   = rtrim(dirname($_SERVER['PHP_SELF']), '/');
+$baseUrl    = $scheme.'://'.$_SERVER['HTTP_HOST'].$basePath;
 $link       = $baseUrl.'?token='.$token;
 purge_expired_sessions();
 $session = open_session($token, !$hasParam);
