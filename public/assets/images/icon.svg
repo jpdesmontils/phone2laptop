@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <!-- Smartphone -->
+  <rect x="20" y="28" width="38" height="72" rx="4" ry="4" fill="none" stroke="#000" stroke-width="4"/>
+  <rect x="37" y="90" width="4" height="4" rx="4" fill="#000"/>
+
+  <!-- Laptop -->
+  <rect x="12" y="38" width="54" height="44" rx="2" ry="2" fill="none" stroke="#007BFF" stroke-width="4"/>
+  <rect x="4" y="82" width="70" height="6" rx="2" ry="2" fill="#007BFF"/>
+
+</svg>

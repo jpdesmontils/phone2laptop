@@ -1,0 +1,12 @@
+# Interdire l'accès direct à tous les fichiers .php dans ce dossier
+<Files "*.php">
+  Require all denied
+</Files>
+
+# Optionnel : interdire aussi l'accès à d'autres fichiers sensibles
+<FilesMatch "\.(env|log|ini|sql|md|yml|yaml|json)$">
+  Require all denied
+</FilesMatch>
+
+# Empêcher le listing du dossier
+Options -Indexes
