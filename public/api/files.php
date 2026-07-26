@@ -14,8 +14,9 @@ if (is_dir($dir)) {
 		  .dirname(dirname($_SERVER['PHP_SELF'])).'/api/download.php?token='.$token.'&name=';
 
 	foreach ($files as $f) {
-		$name = basename($f);
-		$list[] = [
+			$name = basename($f);
+			if ($name === 'bloc-notes.txt') continue;
+			$list[] = [
 			'name' => $name,
 			'size' => filesize($f),
 			'url'  => $base.rawurlencode($name)          // ← pointe vers download.php

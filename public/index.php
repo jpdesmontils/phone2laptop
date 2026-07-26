@@ -39,7 +39,6 @@ include __DIR__.'/views/nav.php';
 include __DIR__.'/views/hero.php';
 include __DIR__.'/views/why.php';
 include __DIR__.'/views/exchange-zone.php';
-include __DIR__.'/views/token.php';
 include __DIR__.'/views/testi.php';
 include __DIR__.'/views/donate.php';
 include __DIR__.'/views/footer.php';
