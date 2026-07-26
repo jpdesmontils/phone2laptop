@@ -2,6 +2,8 @@
 /*───────────────────────────────────────────
   API : upload de fichier
 ───────────────────────────────────────────*/
+require_once __DIR__ . '/../includes/storage.php';
+
 header('Content-Type: application/json');
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -18,8 +20,8 @@ function fail(int $code, string $msg): void {
 }
 
 /*── récup. paramètres ─────────────────────*/
-$token = preg_replace('/[^a-f0-9]/', '', $_POST['token'] ?? '');
-if (!$token || empty($_FILES['file'])) {
+$token = normalizeToken($_POST['token'] ?? null);
+if ($token === null || empty($_FILES['file'])) {
     fail(400, 'missing token or file');
 }
 
@@ -74,8 +76,7 @@ if (!in_array($mime, $allowed, true)) {
 }
 
 /*── dossier de session ────────────────────*/
-$root = dirname(__DIR__, 2);                        // remonte à /project
-$dir  = $root . '/uploads/' . $token;
+$dir = sessionDirectory($token);
 if (!is_dir($dir) && !mkdir($dir, 0775, true)) {
     fail(500, 'cannot create dir');
 }
