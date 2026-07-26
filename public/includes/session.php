@@ -27,7 +27,7 @@ function delete_session_directory(string $dir): bool
     return rmdir($dir);
 }
 
-function purge_expired_sessions(): void
+function purge_expired_sessions()
 {
     $root = session_root();
     if (!is_dir($root)) return;
@@ -40,7 +40,10 @@ function purge_expired_sessions(): void
     }
 }
 
-function read_session_metadata(string $dir): ?array
+/**
+ * @return array|null
+ */
+function read_session_metadata(string $dir)
 {
     $file = $dir . '/.session.json';
     if (!is_file($file)) return null;
@@ -48,7 +51,10 @@ function read_session_metadata(string $dir): ?array
     return is_array($metadata) && isset($metadata['createdAt'], $metadata['expiresAt']) ? $metadata : null;
 }
 
-function open_session(string $token, bool $create = false): ?array
+/**
+ * @return array|null
+ */
+function open_session(string $token, bool $create = false)
 {
     $dir = session_dir($token);
     if (!is_dir($dir) && $create) {
@@ -68,7 +74,7 @@ function open_session(string $token, bool $create = false): ?array
     return $metadata + ['dir' => $dir];
 }
 
-function json_error(int $status, string $message): never
+function json_error(int $status, string $message)
 {
     http_response_code($status);
     header('Content-Type: application/json');

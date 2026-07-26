@@ -12,7 +12,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 }
 
 /*── helpers ───────────────────────────────*/
-function fail(int $code, string $msg): void {
+function fail(int $code, string $msg) {
     http_response_code($code);
     echo json_encode(['ok' => false, 'error' => $msg]);
     exit;
