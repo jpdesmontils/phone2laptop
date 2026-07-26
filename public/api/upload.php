@@ -85,18 +85,6 @@ $rawName = basename($file['name']);                 // nom original
 $safeName = preg_replace('/[^\w\-.]/', '_', $rawName); // nettoie (garde l’ext)
 $dest = $dir . '/' . $safeName;
 
-/*── évite d'écraser un fichier existant du même nom ──*/
-if (file_exists($dest)) {
-    $ext  = pathinfo($safeName, PATHINFO_EXTENSION);
-    $base = pathinfo($safeName, PATHINFO_FILENAME);
-    $i = 1;
-    do {
-        $safeName = $ext !== '' ? "{$base}_{$i}.{$ext}" : "{$base}_{$i}";
-        $dest = $dir . '/' . $safeName;
-        $i++;
-    } while (file_exists($dest));
-}
-
 /*── déplacement ───────────────────────────*/
 if (!move_uploaded_file($file['tmp_name'], $dest)) {
     fail(500, 'cannot move file');
