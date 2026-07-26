@@ -10,7 +10,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 }
 
 // Vérifier le Content-Type
-$contentType = $_SERVER['HTTP_CONTENT_TYPE'] ?? '';
+$contentType = $_SERVER['CONTENT_TYPE'] ?? $_SERVER['HTTP_CONTENT_TYPE'] ?? '';
 // Normaliser (enlever les espaces, paramètres comme charset)
 $contentType = strtolower(trim(explode(';', $contentType)[0]));
 
@@ -58,6 +58,34 @@ if (!is_dir($dir)) {
 }
 
 switch ($action) {
+    case 'delete_file':
+        $name = $payload['name'] ?? '';
+        if (!is_string($name) || $name === '' || basename($name) !== $name || $name === 'bloc-notes.txt') {
+            http_response_code(400);
+            header('Content-Type: application/json');
+            echo json_encode(['error' => 'Nom de fichier invalide']);
+            exit;
+        }
+
+        $file = $dir . '/' . $name;
+        if (!is_file($file)) {
+            http_response_code(404);
+            header('Content-Type: application/json');
+            echo json_encode(['error' => 'Fichier introuvable']);
+            exit;
+        }
+
+        if (!unlink($file)) {
+            http_response_code(500);
+            header('Content-Type: application/json');
+            echo json_encode(['error' => 'Impossible de supprimer le fichier']);
+            exit;
+        }
+
+        header('Content-Type: application/json');
+        echo json_encode(['ok' => true]);
+        break;
+
     case 'delete':
         if (!delete_session_directory($dir)) {
             http_response_code(500);
