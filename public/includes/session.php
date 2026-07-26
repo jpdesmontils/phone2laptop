@@ -34,7 +34,7 @@ function purge_expired_sessions()
     foreach (new DirectoryIterator($root) as $entry) {
         if (!$entry->isDir() || $entry->isDot()) continue;
         $metadata = read_session_metadata($entry->getPathname());
-        if ($metadata && $metadata['expiresAt'] <= time()) {
+        if ($metadata && $metadata['expiresAt'] !== null && $metadata['expiresAt'] <= time()) {
             delete_session_directory($entry->getPathname());
         }
     }
@@ -48,7 +48,9 @@ function read_session_metadata(string $dir)
     $file = $dir . '/.session.json';
     if (!is_file($file)) return null;
     $metadata = json_decode((string) file_get_contents($file), true);
-    return is_array($metadata) && isset($metadata['createdAt'], $metadata['expiresAt']) ? $metadata : null;
+    return is_array($metadata)
+        && isset($metadata['createdAt'])
+        && array_key_exists('expiresAt', $metadata) ? $metadata : null;
 }
 
 /**
@@ -62,16 +64,25 @@ function open_session(string $token, bool $create = false)
         $createdAt = time();
         file_put_contents($dir . '/.session.json', json_encode([
             'createdAt' => $createdAt,
-            'expiresAt' => $createdAt + SESSION_TTL,
+            'expiresAt' => null,
         ]), LOCK_EX);
     }
     $metadata = read_session_metadata($dir);
     if (!$metadata) return null;
-    if ($metadata['expiresAt'] <= time()) {
+    if ($metadata['expiresAt'] !== null && $metadata['expiresAt'] <= time()) {
         delete_session_directory($dir);
         return null;
     }
     return $metadata + ['dir' => $dir];
+}
+
+function renew_session(string $dir)
+{
+    $metadata = read_session_metadata($dir);
+    if (!$metadata) return null;
+    $metadata['expiresAt'] = time() + SESSION_TTL;
+    if (file_put_contents($dir . '/.session.json', json_encode($metadata), LOCK_EX) === false) return null;
+    return $metadata;
 }
 
 function json_error(int $status, string $message)

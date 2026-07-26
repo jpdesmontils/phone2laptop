@@ -29,21 +29,17 @@ $file = $_FILES['file'];
 
 /*── contrôles de base ─────────────────────*/
 if ($file['error'] !== UPLOAD_ERR_OK) {
-	$err = $file['error'];
-	if ($err !== UPLOAD_ERR_OK) {
-		$map = [
-			1   =>  'Le fichier dépasse la limite serveur (php.ini).',
-			2  	=>  'Le fichier dépasse la limite du formulaire HTML.',
-			3   =>  'Le fichier n’a été que partiellement téléversé.',
-			4   =>  'Aucun fichier n’a été envoyé.',
-			6 	=>  'Dossier temporaire manquant sur le serveur.',
-			7 	=>  'Impossible d’écrire le fichier sur le disque.',
-			8  	=>  'Téléversement stoppé par une extension PHP.'];
-
-		fail(500, $map[$err] );  
-	}
-	// fail(500, "Erreur de type [$err]" );          // fail() = helper qui renvoie JSON + code HTTP
-	// }
+    $err = $file['error'];
+    $map = [
+        1 => 'Le fichier dépasse la limite serveur (php.ini).',
+        2 => 'Le fichier dépasse la limite du formulaire HTML.',
+        3 => 'Le fichier n’a été que partiellement téléversé.',
+        4 => 'Aucun fichier n’a été envoyé.',
+        6 => 'Dossier temporaire manquant sur le serveur.',
+        7 => 'Impossible d’écrire le fichier sur le disque.',
+        8 => 'Téléversement stoppé par une extension PHP.',
+    ];
+    fail(500, $map[$err] ?? "Erreur de téléversement ($err)");
 }
 
 
@@ -67,11 +63,17 @@ if (file_exists($dest)) fail(409, 'encrypted file already exists');
 if (!move_uploaded_file($file['tmp_name'], $dest)) {
     fail(500, 'cannot move file');
 }
+$session = renew_session($dir);
+if (!$session) {
+    unlink($dest);
+    fail(500, 'cannot renew session');
+}
 
 /*── réponse OK ────────────────────────────*/
 echo json_encode([
     'ok'   => true,
     'name' => $safeName,
     'size' => $file['size'],
-    'mime' => 'application/octet-stream'
+    'mime' => 'application/octet-stream',
+    'expiresAt' => $session['expiresAt'] * 1000
 ]);

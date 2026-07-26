@@ -13,6 +13,7 @@
     progress: document.getElementById('upload-progress'),
     progressBar: document.getElementById('progress-bar'),
     countdown: document.getElementById('expiry-countdown'),
+    expiryLabel: document.getElementById('expiry-label'),
     qr: document.getElementById('session-qr')
   };
   if (!config || Object.values(elements).some(element => !element)) return;
@@ -77,7 +78,7 @@
     return response;
   }
 
-  function addFileRow(remote, file) {
+  function addFileRow(file) {
     const item = document.createElement('li');
     item.className = 'list-group-item d-flex justify-content-between align-items-center gap-3';
     const label = document.createElement('div');
@@ -108,12 +109,14 @@
 
   async function refreshFiles(key) {
     const response = await api(`${config.apiBase}files.php?token=${encodeURIComponent(config.token)}`);
+    const expiresAt = response.headers.get('X-Session-Expires-At');
+    config.expiresAt = expiresAt ? Number(expiresAt) : null;
     const files = await response.json();
     elements.list.replaceChildren();
     for (const remote of files) {
       try {
         const encrypted = await (await api(remote.url)).arrayBuffer();
-        addFileRow(remote, unpackFile(await decryptBytes(key, encrypted)));
+        addFileRow(unpackFile(await decryptBytes(key, encrypted)));
       } catch (error) {
         console.error('Fichier chiffré illisible :', remote.id, error);
       }
@@ -146,8 +149,16 @@
     const encrypted = await encryptBytes(key, packFile(file, await file.arrayBuffer()));
     const data = new FormData();
     data.append('token', config.token);
-    data.append('file', new Blob([encrypted], { type: 'application/octet-stream' }), `${crypto.randomUUID()}.enc`);
-    await api(`${config.apiBase}upload.php`, { method: 'POST', body: data });
+    const id = typeof crypto.randomUUID === 'function'
+      ? crypto.randomUUID()
+      : 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, character => {
+          const random = crypto.getRandomValues(new Uint8Array(1))[0] & 15;
+          return (character === 'x' ? random : (random & 3) | 8).toString(16);
+        });
+    data.append('file', new Blob([encrypted], { type: 'application/octet-stream' }), `${id}.enc`);
+    const response = await api(`${config.apiBase}upload.php`, { method: 'POST', body: data });
+    const result = await response.json();
+    config.expiresAt = result.expiresAt;
   }
 
   async function deleteSession() {
@@ -162,6 +173,12 @@
   function startCountdown() {
     let deletionRequested = false;
     const update = async () => {
+      if (config.expiresAt === null) {
+        elements.expiryLabel.hidden = false;
+        elements.countdown.textContent = '';
+        return;
+      }
+      elements.expiryLabel.hidden = true;
       const remaining = Math.max(0, config.expiresAt - Date.now());
       const totalSeconds = Math.ceil(remaining / 1000);
       const minutes = Math.floor(totalSeconds / 60);
@@ -182,7 +199,12 @@
   async function initialize() {
     const { encodedKey, key } = await sessionKey();
     const shareUrl = `${config.shareUrl}#key=${encodeURIComponent(encodedKey)}&share=`;
-    new QRCode(elements.qr, { text: shareUrl, width: 180, height: 180, correctLevel: QRCode.CorrectLevel.M });
+    if (typeof QRCode === 'function') {
+      new QRCode(elements.qr, { text: shareUrl, width: 180, height: 180, correctLevel: QRCode.CorrectLevel.M });
+    } else {
+      elements.qr.textContent = 'QR Code indisponible';
+      console.error('Le générateur de QR Code est indisponible.');
+    }
     startCountdown();
     await Promise.all([refreshFiles(key), loadText(key)]);
     setInterval(() => Promise.all([refreshFiles(key), loadText(key)]).catch(console.error), 2000);
@@ -192,8 +214,9 @@
       clearTimeout(typingTimer);
       typingTimer = setTimeout(() => saveText(key).catch(console.error), 500);
     });
-    elements.input.addEventListener('change', async event => {
-      const files = Array.from(event.target.files);
+    const sendFiles = async files => {
+      if (files.length === 0) return;
+      elements.progressBar.style.width = '0%';
       elements.progress.style.display = 'block';
       try {
         for (let index = 0; index < files.length; index++) {
@@ -202,7 +225,14 @@
         }
         await refreshFiles(key);
       } catch (error) { alert(`❌ Erreur : ${error.message}`); }
-      finally { elements.progress.style.display = 'none'; event.target.value = ''; }
+      finally { elements.progress.style.display = 'none'; elements.input.value = ''; }
+    };
+    elements.input.addEventListener('change', event => sendFiles(Array.from(event.target.files)));
+    const uploadForm = elements.input.closest('form');
+    uploadForm.addEventListener('dragover', event => event.preventDefault());
+    uploadForm.addEventListener('drop', event => {
+      event.preventDefault();
+      sendFiles(Array.from(event.dataTransfer.files));
     });
     elements.copy.addEventListener('click', () => navigator.clipboard.writeText(elements.text.value));
     elements.delete.addEventListener('click', async () => {
