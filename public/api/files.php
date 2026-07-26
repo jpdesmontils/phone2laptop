@@ -1,26 +1,18 @@
 <?php
+require_once dirname(__DIR__) . '/includes/session.php';
 header('Content-Type: application/json');
 
-$token = preg_replace('/[^a-f0-9]/', '', $_GET['token'] ?? '');
-$root  = dirname(__DIR__, 2);
-$dir   = $root.'/uploads/'.$token;
+$token = session_token($_GET['token'] ?? '');
+if (!$token) json_error(400, 'Token invalide');
+$session = open_session($token);
+if (!$session) json_error(410, 'Session expirée');
 
-$list  = [];
-if (is_dir($dir)) {
-    $files = glob($dir.'/*');
-    sort($files);
-	$base = ((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS']!=='off') ? 'https' : 'http')
-		  .'://'.$_SERVER['HTTP_HOST']
-		  .dirname(dirname($_SERVER['PHP_SELF'])).'/api/download.php?token='.$token.'&name=';
-
-	foreach ($files as $f) {
-			$name = basename($f);
-			if ($name === 'bloc-notes.txt') continue;
-			$list[] = [
-			'name' => $name,
-			'size' => filesize($f),
-			'url'  => $base.rawurlencode($name)          // ← pointe vers download.php
-		];
-	}
+$base = ((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http')
+    . '://' . $_SERVER['HTTP_HOST'] . dirname(dirname($_SERVER['PHP_SELF']))
+    . '/api/download.php?token=' . $token . '&name=';
+$list = [];
+foreach (glob($session['dir'] . '/*.enc') ?: [] as $file) {
+    $id = basename($file);
+    $list[] = ['id' => $id, 'size' => filesize($file), 'url' => $base . rawurlencode($id)];
 }
 echo json_encode($list);
