@@ -291,6 +291,7 @@ document.addEventListener('DOMContentLoaded', function () {
 <script>
 const token   = "<?= $token ?>";
 const apiBase = "<?= $baseUrl ?>/api/";
+const mobileDevice = <?= isMobile() ? 'true' : 'false' ?>;
 
 /* ---------- fichiers ---------- */
 const listEl = document.getElementById('file-list');
@@ -314,10 +315,10 @@ function renderList(files){
     const ext = lowerName.split('.').pop();
 
     // Types d'images supportés
-    const imageExts = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp', 'svg'];
-    if (imageExts.includes(ext)) {
+    const imageExts = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'avif', 'heic', 'heif', 'bmp', 'svg'];
+    if (imageExts.includes(ext) && !mobileDevice) {
       previewHtml = `<a href="${f.url}"><img src="${f.url}" alt="Miniature" class="img-thumbnail" style="width:40px; height:40px; object-fit:cover;"></a>`;
-	  
+
     } else {
       // Icônes par type de fichier
       let icon = 'bi-file-earmark'; // icône par défaut
@@ -333,6 +334,8 @@ function renderList(files){
         icon = 'bi-file-earmark-text text-secondary';
       } else if (['zip', 'rar', '7z'].includes(ext)) {
         icon = 'bi-file-earmark-zip text-info';
+      } else if (imageExts.includes(ext)) {
+        icon = 'bi-file-earmark-image text-primary';
       }
       previewHtml = `<a class="bi ${icon}" href="${f.url}"  style="font-size: 1.5rem;"></a>`;
     }
@@ -490,14 +493,24 @@ document.getElementById('btn-copy').addEventListener('click', async () => {
 
 /* ---------- tout supprimer ---------- */
 document.getElementById('btn-delete').addEventListener('click', async ()=>{
-  await fetch(apiBase+'close.php', {
-    method:'POST',
-    headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({token,action:'delete'})
-  });
-  listEl.innerHTML = '';
-  txtField.value   = '';
-  txtCache         = '';
+  if (!confirm('Êtes-vous sûr de vouloir tout supprimer ?')) return;
+
+  try {
+    const response = await fetch(apiBase+'close.php', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({token,action:'delete'})
+    });
+    if (!response.ok) {
+      throw new Error(`Échec de la suppression (${response.status})`);
+    }
+    listEl.innerHTML = '';
+    txtField.value   = '';
+    txtCache         = '';
+  } catch (error) {
+    console.error('Delete error:', error);
+    alert('❌ Erreur : ' + error.message);
+  }
 });
 </script>
 <?php endif; ?>

@@ -1,5 +1,4 @@
 <?php
-if (!defined('PHONE2LAPTOP_APP')) exit('Accès direct interdit.');
 
 // Autoriser uniquement les requêtes POST
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -60,10 +59,24 @@ if (!is_dir($dir)) {
 
 switch ($action) {
     case 'delete':
-        foreach (glob($dir . '/*') as $file) {
-            if (is_file($file)) unlink($file);
+        $entries = array_merge(glob($dir . '/*') ?: [], glob($dir . '/.*') ?: []);
+        foreach ($entries as $file) {
+            $name = basename($file);
+            if ($name === '.' || $name === '..') continue;
+
+            if (is_file($file) && !unlink($file)) {
+                http_response_code(500);
+                header('Content-Type: application/json');
+                echo json_encode(['error' => 'Impossible de supprimer tous les fichiers']);
+                exit;
+            }
         }
-        rmdir($dir);
+        if (!rmdir($dir)) {
+            http_response_code(500);
+            header('Content-Type: application/json');
+            echo json_encode(['error' => 'Impossible de supprimer la session']);
+            exit;
+        }
         header('Content-Type: application/json');
         echo json_encode(['ok' => true]);
         break;
