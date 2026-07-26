@@ -4,11 +4,11 @@ RewriteEngine On
 # Bloque l'accès direct au dossier /views/
 RewriteRule ^views/ - [R=403,L]
 
-# Autorise explicitement l'accès au manifest.json
-<Files "manifest.json">
+# Les ressources publiques doivent rester accessibles même si l'hébergeur
+# applique une règle d'accès restrictive dans un dossier parent.
+<FilesMatch "\.(?:css|ico|js|json|png|svg|webmanifest)$">
   Require all granted
-  Header set Content-Type "application/manifest+json"
-</Files>
+</FilesMatch>
 
 # (Optionnel) — Pour t'assurer que les fichiers JSON sont servis avec le bon type MIME
 AddType application/manifest+json .webmanifest .json
