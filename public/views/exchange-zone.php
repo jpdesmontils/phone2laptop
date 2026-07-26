@@ -1,25 +1,4 @@
 <?php if (!defined('PHONE2LAPTOP_APP')) exit('Accès direct interdit.'); ?>
-<?php
-function isMobile() {
-    $userAgent = $_SERVER['HTTP_USER_AGENT'] ?? '';
-
-    // Mots-clés typiques des appareils mobiles
-    $mobileKeywords = [
-        'Mobile', 'Android', 'iPhone', 'iPad', 'iPod', 'BlackBerry',
-        'IEMobile', 'Opera Mini', 'Opera Mobi', 'Windows Phone',
-        'BB10', 'PlayBook', 'Mobile Safari', 'webOS', 'Kindle', 'Silk'
-    ];
-	// echo "$userAgent";
-
-    foreach ($mobileKeywords as $keyword) {
-        if (stripos($userAgent, $keyword) !== false) {
-            return true;
-        }
-    }
-
-    return false;
-}
-?>
 <!--
 ######################################
 	

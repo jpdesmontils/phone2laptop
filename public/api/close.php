@@ -1,6 +1,4 @@
 <?php
-if (!defined('PHONE2LAPTOP_APP')) exit('Accès direct interdit.');
-
 // Autoriser uniquement les requêtes POST
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     http_response_code(405);
@@ -60,10 +58,13 @@ if (!is_dir($dir)) {
 
 switch ($action) {
     case 'delete':
-        foreach (glob($dir . '/*') as $file) {
-            if (is_file($file)) unlink($file);
+        $entries = array_merge(glob($dir . '/*') ?: [], glob($dir . '/.*') ?: []);
+        foreach ($entries as $file) {
+            $base = basename($file);
+            if ($base === '.' || $base === '..') continue;
+            if (is_file($file)) @unlink($file);
         }
-        rmdir($dir);
+        @rmdir($dir);
         header('Content-Type: application/json');
         echo json_encode(['ok' => true]);
         break;
