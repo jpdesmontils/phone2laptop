@@ -295,17 +295,6 @@ const mobileDevice = <?= isMobile() ? 'true' : 'false' ?>;
 
 /* ---------- fichiers ---------- */
 const listEl = document.getElementById('file-list');
-function renderList_old(files){
-  listEl.innerHTML = '';
-  files.forEach(f=>{
-    const li = document.createElement('li');
-    li.className = 'list-group-item d-flex justify-content-between align-items-center';
-    li.innerHTML =
-      `<span>${f.name} <span class="badge bg-secondary">${Math.round(f.size/1024)} Ko</span></span>
-       <a class="btn btn-sm btn-outline-primary" href="${f.url}" download>↓</a>`;
-    listEl.appendChild(li);
-  });
-}
 function renderList(files){
   listEl.innerHTML = '';
   files.forEach(f => {
@@ -350,10 +339,37 @@ function renderList(files){
           <small class="text-muted">${Math.round(f.size/1024)} Ko</small>
         </div>
       </div>
-      <a class="btn btn-sm btn-outline-primary" href="${f.url}" download>↓</a>
+      <div class="d-flex gap-1">
+        <a class="btn btn-sm btn-outline-primary" href="${f.url}" download aria-label="Télécharger le fichier" title="Télécharger">
+          <i class="bi bi-download"></i>
+        </a>
+        <button class="btn btn-sm btn-outline-danger delete-file" type="button" aria-label="Supprimer le fichier" title="Supprimer">
+          <i class="bi bi-trash"></i>
+        </button>
+      </div>
     `;
+    li.querySelector('.delete-file').addEventListener('click', () => deleteFile(f.name));
     listEl.appendChild(li);
   });
+}
+
+async function deleteFile(name){
+  if (!confirm(`Supprimer « ${name} » ?`)) return;
+
+  try {
+    const response = await fetch(apiBase+'close.php', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({token,action:'delete_file',name})
+    });
+    if (!response.ok) {
+      throw new Error(`Échec de la suppression (${response.status})`);
+    }
+    await refreshFiles();
+  } catch (error) {
+    console.error('Delete file error:', error);
+    alert('❌ Erreur : ' + error.message);
+  }
 }
 
 
