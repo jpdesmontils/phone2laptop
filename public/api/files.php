@@ -1,11 +1,9 @@
 <?php
-require_once __DIR__ . '/../includes/storage.php';
-
 header('Content-Type: application/json');
 
-$token = normalizeToken($_GET['token'] ?? null);
-if ($token === null) { http_response_code(400); echo json_encode(['error' => 'Token invalide']); exit; }
-$dir = sessionDirectory($token);
+$token = preg_replace('/[^a-f0-9]/', '', $_GET['token'] ?? '');
+$root  = dirname(__DIR__, 2);
+$dir   = $root.'/uploads/'.$token;
 
 $list  = [];
 if (is_dir($dir)) {
@@ -16,7 +14,6 @@ if (is_dir($dir)) {
 		  .dirname(dirname($_SERVER['PHP_SELF'])).'/api/download.php?token='.$token.'&name=';
 
 	foreach ($files as $f) {
-		if (!is_file($f)) continue;
 		$name = basename($f);
 		$list[] = [
 			'name' => $name,

@@ -1,22 +1,22 @@
 <?php
-require_once __DIR__ . '/../includes/storage.php';
-
-header('Content-Type: application/json');
+if (!defined('PHONE2LAPTOP_APP')) exit('Accès direct interdit.');
 
 // Autoriser uniquement les requêtes POST
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     http_response_code(405);
+    header('Content-Type: application/json');
     echo json_encode(['error' => 'Méthode non autorisée']);
     exit;
 }
 
 // Vérifier le Content-Type
-$contentType = $_SERVER['CONTENT_TYPE'] ?? '';
+$contentType = $_SERVER['HTTP_CONTENT_TYPE'] ?? '';
 // Normaliser (enlever les espaces, paramètres comme charset)
 $contentType = strtolower(trim(explode(';', $contentType)[0]));
 
 if ($contentType !== 'application/json') {
     http_response_code(415);
+    header('Content-Type: application/json');
     echo json_encode(['error' => 'Type de média non supporté. Utilisez application/json.']);
     exit;
 }
@@ -25,6 +25,7 @@ if ($contentType !== 'application/json') {
 $input = file_get_contents('php://input');
 if ($input === false || $input === '') {
     http_response_code(400);
+    header('Content-Type: application/json');
     echo json_encode(['error' => 'Corps de requête vide']);
     exit;
 }
@@ -32,32 +33,43 @@ if ($input === false || $input === '') {
 $payload = json_decode($input, true);
 if (json_last_error() !== JSON_ERROR_NONE) {
     http_response_code(400);
+    header('Content-Type: application/json');
     echo json_encode(['error' => 'JSON invalide']);
     exit;
 }
 
-$token = normalizeToken($payload['token'] ?? null);
+$token = preg_replace('/[^a-f0-9]/', '', $payload['token'] ?? '');
 $action = $payload['action'] ?? 'delete';
 
-if ($token === null) {
+if (!$token || strlen($token) < 32) {
     http_response_code(400);
+    header('Content-Type: application/json');
     echo json_encode(['error' => 'Token invalide']);
     exit;
 }
 
-$dir = sessionDirectory($token);
+$root = dirname(__DIR__, 2);
+$dir  = $root . '/uploads/' . $token;
+
+if (!is_dir($dir)) {
+    http_response_code(404);
+    header('Content-Type: application/json');
+    echo json_encode(['error' => 'Session introuvable']);
+    exit;
+}
 
 switch ($action) {
     case 'delete':
-        if (!deleteDirectory($dir)) {
-            http_response_code(500);
-            echo json_encode(['error' => 'Suppression incomplète']);
-            exit;
+        foreach (glob($dir . '/*') as $file) {
+            if (is_file($file)) unlink($file);
         }
+        rmdir($dir);
+        header('Content-Type: application/json');
         echo json_encode(['ok' => true]);
         break;
 
     default:
         http_response_code(400);
+        header('Content-Type: application/json');
         echo json_encode(['error' => 'Action inconnue']);
 }

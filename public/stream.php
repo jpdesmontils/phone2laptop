@@ -1,13 +1,11 @@
 <?php
-require_once __DIR__ . '/includes/storage.php';
-
 if (empty($_GET['token'])) {
     http_response_code(400);
     exit;
 }
-$token = normalizeToken($_GET['token']);
-if ($token === null) { http_response_code(400); exit; }
-$dir = sessionDirectory($token);
+$token = preg_replace('/[^a-f0-9]/', '', $_GET['token']);
+$root  = dirname(__DIR__);
+$dir   = $root.'/uploads/'.$token;
 
 header("Content-Type: text/event-stream");
 header("Cache-Control: no-cache");

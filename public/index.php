@@ -3,7 +3,9 @@
   phone2laptop – landing + zone d’échange (SSE)
 ──────────────────────────────────────────────*/
 define('PHONE2LAPTOP_APP', true);
-require_once __DIR__ . '/includes/storage.php';
+include_once	"lib.php";
+// include_once 	'includes/config.php';
+// include_once	'includes/functions.php';
 
 // ─── paramètres
 $TTL        = 1800;                                   // 30 minutes
@@ -24,7 +26,8 @@ $sessionDir  = $uploadsRoot.'/'.$token;
 if (is_dir($uploadsRoot)) {
     foreach (glob($uploadsRoot.'/*') as $d) {
         if (is_dir($d) && (time() - filemtime($d) > $TTL)) {
-            deleteDirectory($d);
+            array_map('unlink', glob($d.'/*'));
+            @rmdir($d);
         }
     }
 }
@@ -36,6 +39,7 @@ include __DIR__.'/views/nav.php';
 include __DIR__.'/views/hero.php';
 include __DIR__.'/views/why.php';
 include __DIR__.'/views/exchange-zone.php';
+include __DIR__.'/views/token.php';
 include __DIR__.'/views/testi.php';
 include __DIR__.'/views/donate.php';
 include __DIR__.'/views/footer.php';

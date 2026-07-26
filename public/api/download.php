@@ -1,13 +1,10 @@
 <?php
 /* Téléchargement sécurisé avec en-têtes MIME corrects */
-require_once __DIR__ . '/../includes/storage.php';
-
 if (empty($_GET['token']) || empty($_GET['name'])) { http_response_code(400); exit; }
 
-$token = normalizeToken($_GET['token']);
-if ($token === null) { http_response_code(400); exit; }
+$token = preg_replace('/[^a-f0-9]/', '', $_GET['token']);
 $name  = basename($_GET['name']);                               // protège contre ../
-$path  = sessionDirectory($token)."/$name";
+$path  = dirname(__DIR__, 2)."/uploads/$token/$name";
 
 if (!is_file($path)) { http_response_code(404); exit; }
 
