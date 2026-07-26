@@ -10,7 +10,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 }
 
 // Vérifier le Content-Type
-$contentType = $_SERVER['HTTP_CONTENT_TYPE'] ?? '';
+$contentType = $_SERVER['CONTENT_TYPE'] ?? $_SERVER['HTTP_CONTENT_TYPE'] ?? '';
 // Normaliser (enlever les espaces, paramètres comme charset)
 $contentType = strtolower(trim(explode(';', $contentType)[0]));
 

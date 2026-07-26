@@ -227,6 +227,11 @@ document.addEventListener('DOMContentLoaded', function () {
       Données chiffrées de bout en bout — suppression dans <strong id="expiry-countdown">30 min 00 s</strong>.
     </div>
 
+    <div class="alert alert-primary text-center" role="status">
+      <i class="bi bi-shield-lock-fill me-1"></i>
+      Données chiffrées de bout en bout — suppression dans <strong id="expiry-countdown">30 min 00 s</strong>.
+    </div>
+
     <div class="row g-4" id="share">
       <!-- Fichiers -->
       <div class="col-md-6">
