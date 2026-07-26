@@ -34,6 +34,7 @@
             <li class="mb-3"><i class="bi bi-check-circle-fill text-success me-2"></i> <strong>Instantané</strong> : scan → partage. Moins de 5 secondes.</li>
             <li class="mb-3"><i class="bi bi-check-circle-fill text-success me-2"></i> <strong>100 % gratuit</strong>, sans compte, sans pub, sans limite.</li>
             <li class="mb-3"><i class="bi bi-check-circle-fill text-success me-2"></i> <strong>Aucune donnée personnelle</strong> n’est collectée, stockée ou analysée.</li>
+            <li class="mb-3"><i class="bi bi-check-circle-fill text-success me-2"></i> <strong>Chiffrement de bout en bout</strong> : la clé reste sur vos appareils, nous ne pouvons pas accéder à vos fichiers ni à vos notes.</li>
             <li class="mb-3"><i class="bi bi-check-circle-fill text-success me-2"></i> <strong>Auto-suppression</strong> après 30 minutes — vos fichiers disparaissent seuls.</li>
             <li class="mb-3"><i class="bi bi-check-circle-fill text-success me-2"></i> <strong>Open-source</strong> : transparence totale, sécurité vérifiable.</li>
           </ul>
