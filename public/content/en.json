@@ -1,0 +1,207 @@
+{
+  "meta": {
+    "title": "Phone2Laptop — Transfer files between your phone and computer",
+    "description": "Transfer photos, PDFs, videos, links and notes between your phone and computer. No app, account or cable."
+  },
+  "nav": {
+    "how": "How it works",
+    "security": "Security",
+    "studio": "Created by Solenis Studio",
+    "language": "Français"
+  },
+  "hero": {
+    "eyebrow": "Instant file transfer",
+    "title": "Move files from your phone to your computer in seconds.",
+    "subtitle": "Scan a QR code and immediately transfer photos, PDFs, videos, links or notes. No app, account or cable.",
+    "primary": "Show my QR code",
+    "secondary": "How does it work?",
+    "trust": "No account · No installation · Compatible with iPhone, Android, Windows and Mac",
+    "limit": "Up to 50 MB per file"
+  },
+  "assurances": [
+    {
+      "text": "No account to create"
+    },
+    {
+      "text": "No app to install"
+    },
+    {
+      "text": "Two-way transfer"
+    },
+    {
+      "text": "Works in modern browsers"
+    },
+    {
+      "text": "Browser-side encryption"
+    }
+  ],
+  "how": {
+    "title": "One scan is enough.",
+    "intro": "Phone2Laptop temporarily connects your phone and computer through their browsers. No complex setup required.",
+    "steps": [
+      {
+        "number": "1",
+        "title": "Display the QR code",
+        "text": "Open Phone2Laptop on your computer. A unique QR code is generated for your session."
+      },
+      {
+        "number": "2",
+        "title": "Scan it with your phone",
+        "text": "Scan the QR code with your phone camera. Both devices access the same session."
+      },
+      {
+        "number": "3",
+        "title": "Send your content",
+        "text": "Transfer a file, photo, document, link or note in either direction."
+      }
+    ]
+  },
+  "uses": {
+    "title": "For everyday small transfers.",
+    "items": [
+      {
+        "icon": "bi-camera",
+        "title": "Photos and videos",
+        "text": "Quickly retrieve a photo taken on your phone on your computer."
+      },
+      {
+        "icon": "bi-file-earmark-pdf",
+        "title": "PDFs and documents",
+        "text": "Send a document to your phone to view, sign or share it."
+      },
+      {
+        "icon": "bi-link-45deg",
+        "title": "Notes and links",
+        "text": "Copy an address, link or text between devices without messaging yourself."
+      },
+      {
+        "icon": "bi-devices",
+        "title": "Every ecosystem",
+        "text": "Transfer between Android and Mac, iPhone and Windows, or any combination with a modern browser."
+      }
+    ]
+  },
+  "comparison": {
+    "title": "More direct than email, cloud storage or a cable.",
+    "intro": "You should not need to email yourself, find a cable or upload to the cloud to move a document between two devices in front of you.",
+    "headers": [
+      {
+        "text": "Criterion"
+      },
+      {
+        "text": "Phone2Laptop"
+      },
+      {
+        "text": "Email / cloud"
+      },
+      {
+        "text": "Cable"
+      }
+    ],
+    "rows": [
+      {
+        "criterion": "Installation required",
+        "p2l": "No",
+        "cloud": "Depends on service",
+        "cable": "Driver sometimes required"
+      },
+      {
+        "criterion": "Account required",
+        "p2l": "No",
+        "cloud": "Usually",
+        "cable": "No"
+      },
+      {
+        "criterion": "Cross-platform",
+        "p2l": "Modern browser",
+        "cloud": "Depends on service",
+        "cable": "Depends on devices"
+      },
+      {
+        "criterion": "Persistent storage",
+        "p2l": "Not intended",
+        "cloud": "Yes, by default",
+        "cable": "No"
+      },
+      {
+        "criterion": "Two-way transfer",
+        "p2l": "Yes",
+        "cloud": "Yes",
+        "cable": "Depends on devices"
+      }
+    ]
+  },
+  "security": {
+    "title": "Your transfers stay private.",
+    "intro": "Phone2Laptop is designed to limit the data it handles and how long transferred content is retained.",
+    "items": [
+      {
+        "title": "No user profile",
+        "text": "No account is required. Phone2Laptop does not create a personal profile associated with your transfers."
+      },
+      {
+        "title": "Encrypted content",
+        "text": "Files and notes are encrypted in your browser with AES-GCM before upload. The key travels in the session link fragment and is not sent to our server."
+      },
+      {
+        "title": "Temporary retention",
+        "text": "Content remains encrypted on the server. After the first file upload, the session expires 30 minutes later. You can also delete it immediately."
+      },
+      {
+        "title": "Transparent scope",
+        "text": "A note alone does not currently start the 30-minute timer. Do not use the service as storage and delete the session after use."
+      }
+    ]
+  },
+  "benefits": {
+    "title": "Why Phone2Laptop simplifies transfers",
+    "items": [
+      {
+        "text": "No software to install"
+      },
+      {
+        "text": "No account to configure"
+      },
+      {
+        "text": "A modern browser is all both devices need"
+      }
+    ]
+  },
+  "studio": {
+    "eyebrow": "A Solenis Studio product",
+    "title": "You just used an MVP designed to get straight to the point.",
+    "text1": "Phone2Laptop was designed and developed by Solenis Studio to solve a simple friction with a fast, useful experience and no needless complexity.",
+    "text2": "We help entrepreneurs and companies design and develop SaaS, business applications and digital products, from framing to production.",
+    "primary": "Discuss my project",
+    "secondary": "Discover Solenis Studio"
+  },
+  "donate": {
+    "title": "Is Phone2Laptop useful to you?",
+    "text": "The service is free and ad-free. Your support helps fund hosting, maintenance and future improvements.",
+    "cta": "Support the project"
+  },
+  "footer": {
+    "support": "Support the project",
+    "notice": "Legal pages and security documentation have not yet been published."
+  },
+  "exchange": {
+    "title": "Connect your devices",
+    "desktop": "Scan this QR code with your phone, then select a file or enter a note.",
+    "mobile": "Open phone2laptop.com on your computer, then scan the QR code shown there.",
+    "qrAlt": "Session link to open on the other device",
+    "waiting": "The deletion timer will start after the first file is sent.",
+    "encrypted": "Content is encrypted in your browser.",
+    "files": "Share files",
+    "choose": "Choose files",
+    "drop": "Drag and drop is also available — maximum 50 MB per file",
+    "sending": "Uploading…",
+    "notes": "Share a note or link",
+    "placeholder": "Write a note or paste a link…",
+    "copy": "Copy",
+    "delete": "Delete everything",
+    "successTitle": "Transfer complete.",
+    "successText": "Phone2Laptop is a product designed by Solenis Studio.",
+    "successLink": "Have a SaaS or application idea? Let’s talk.",
+    "favorite": "Bookmark Phone2Laptop"
+  }
+}

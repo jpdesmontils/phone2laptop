@@ -1,0 +1,22 @@
+<main id="main-content">
+  <section class="hero section-pad">
+    <div class="container hero-grid">
+      <div>
+        <p class="eyebrow">{{hero.eyebrow}}</p>
+        <h1>{{hero.title}}</h1>
+        <p class="lead">{{hero.subtitle}}</p>
+        <div class="actions"><a class="btn btn-primary btn-lg" href="{{sessionUrl}}" data-event="qr_code_displayed"><i class="bi bi-qr-code" aria-hidden="true"></i> {{hero.primary}}</a><a class="btn btn-link" href="#how">{{hero.secondary}}</a></div>
+        <p class="trust">{{hero.trust}}</p><p class="limit"><i class="bi bi-file-earmark-check" aria-hidden="true"></i> {{hero.limit}}</p>
+      </div>
+      <a class="hero-visual" href="{{sessionUrl}}" aria-label="{{hero.primary}}" data-event="qr_code_displayed"><i class="bi bi-phone" aria-hidden="true"></i><span class="visual-line"></span><i class="bi bi-laptop" aria-hidden="true"></i><span>{{tagline}}</span></a>
+    </div>
+  </section>
+  <aside class="assurance" aria-label="Key benefits"><div class="container assurance-grid">{{#assurances}}<span><i class="bi bi-check2" aria-hidden="true"></i>{{text}}</span>{{/assurances}}</div></aside>
+  <section id="how" class="section-pad"><div class="container"><div class="section-head"><p class="eyebrow">01 — {{nav.how}}</p><h2>{{how.title}}</h2><p>{{how.intro}}</p></div><div class="card-grid three">{{#how.steps}}<article class="content-card"><span class="step">{{number}}</span><h3>{{title}}</h3><p>{{text}}</p></article>{{/how.steps}}</div></div></section>
+  <section class="section-pad surface"><div class="container"><div class="section-head"><h2>{{uses.title}}</h2></div><div class="card-grid four">{{#uses.items}}<article class="content-card"><i class="bi {{icon}} card-icon" aria-hidden="true"></i><h3>{{title}}</h3><p>{{text}}</p></article>{{/uses.items}}</div></div></section>
+  <section class="section-pad"><div class="container"><div class="section-head"><h2>{{comparison.title}}</h2><p>{{comparison.intro}}</p></div><div class="table-wrap"><table><thead><tr>{{#comparison.headers}}<th scope="col">{{text}}</th>{{/comparison.headers}}</tr></thead><tbody>{{#comparison.rows}}<tr><th scope="row">{{criterion}}</th><td class="highlight">{{p2l}}</td><td>{{cloud}}</td><td>{{cable}}</td></tr>{{/comparison.rows}}</tbody></table></div></div></section>
+  <section id="security" class="section-pad dark"><div class="container"><div class="section-head"><p class="eyebrow">02 — {{nav.security}}</p><h2>{{security.title}}</h2><p>{{security.intro}}</p></div><div class="card-grid four">{{#security.items}}<article class="security-card"><h3>{{title}}</h3><p>{{text}}</p></article>{{/security.items}}</div></div></section>
+  <section class="section-pad"><div class="container benefits"><h2>{{benefits.title}}</h2><div>{{#benefits.items}}<p><i class="bi bi-check-circle-fill" aria-hidden="true"></i> {{text}}</p>{{/benefits.items}}</div></div></section>
+  <section id="studio" class="section-pad studio"><div class="container studio-grid"><div><p class="eyebrow">{{studio.eyebrow}}</p><h2>{{studio.title}}</h2></div><div><p>{{studio.text1}}</p><p>{{studio.text2}}</p><div class="actions"><a class="btn btn-light" href="{{studioUrl}}" target="_blank" rel="noopener" data-event="solenis_cta_clicked">{{studio.primary}}</a><a href="{{studioUrl}}" target="_blank" rel="noopener" data-event="solenis_cta_clicked">{{studio.secondary}} <span aria-hidden="true">↗</span></a></div></div></div></section>
+  <section id="support" class="section-pad"><div class="container donate"><div><h2>{{donate.title}}</h2><p>{{donate.text}}</p></div><a class="btn btn-outline-primary" href="{{donationUrl}}" target="_blank" rel="noopener" data-event="donation_cta_clicked"><i class="bi bi-heart" aria-hidden="true"></i> {{donate.cta}}</a></div></section>
+</main>

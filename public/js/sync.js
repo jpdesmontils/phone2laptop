@@ -14,7 +14,9 @@
     progressBar: document.getElementById('progress-bar'),
     countdown: document.getElementById('expiry-countdown'),
     expiryLabel: document.getElementById('expiry-label'),
-    qr: document.getElementById('session-qr')
+    qr: document.getElementById('session-qr'),
+    success: document.getElementById('success-prompt'),
+    favorite: document.getElementById('favorite-prompt')
   };
   if (!config || Object.values(elements).some(element => !element)) return;
 
@@ -137,12 +139,14 @@
   async function saveText(key) {
     const clearText = elements.text.value;
     if (clearText === lastText) return;
+    track('transfer_started');
     const ciphertext = encodeBase64Url(await encryptBytes(key, encoder.encode(clearText)));
     await api(`${config.apiBase}text.php`, {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ token: config.token, ciphertext })
     });
     lastText = clearText;
+    completeTransfer();
   }
 
   async function uploadFile(key, file) {
@@ -159,6 +163,21 @@
     const response = await api(`${config.apiBase}upload.php`, { method: 'POST', body: data });
     const result = await response.json();
     config.expiresAt = result.expiresAt;
+  }
+
+  let completedTransfers = 0;
+  function track(event) {
+    if (window.P2LAnalytics) window.P2LAnalytics.track(event);
+  }
+
+  function completeTransfer() {
+    completedTransfers += 1;
+    track('transfer_completed');
+    if (completedTransfers === 2) track('second_transfer_completed');
+    if (!sessionStorage.getItem('p2l-success-prompt')) {
+      sessionStorage.setItem('p2l-success-prompt', 'shown');
+      elements.success.hidden = false;
+    }
   }
 
   async function deleteSession() {
@@ -216,16 +235,26 @@
     });
     const sendFiles = async files => {
       if (files.length === 0) return;
+      if (files.some(file => file.size > 50 * 1024 * 1024)) {
+        track('transfer_failed');
+        alert(config.language === 'fr' ? 'Un fichier dépasse la limite de 50 Mo.' : 'A file exceeds the 50 MB limit.');
+        elements.input.value = '';
+        return;
+      }
+      track('transfer_started');
       elements.progressBar.style.width = '0%';
-      elements.progress.style.display = 'block';
+      elements.progress.hidden = false;
       try {
         for (let index = 0; index < files.length; index++) {
           await uploadFile(key, files[index]);
-          elements.progressBar.style.width = `${Math.round(((index + 1) / files.length) * 100)}%`;
+          const percentage = Math.round(((index + 1) / files.length) * 100);
+          elements.progressBar.style.width = `${percentage}%`;
+          elements.progress.querySelector('[role="progressbar"]').setAttribute('aria-valuenow', String(percentage));
         }
         await refreshFiles(key);
-      } catch (error) { alert(`❌ Erreur : ${error.message}`); }
-      finally { elements.progress.style.display = 'none'; elements.input.value = ''; }
+        completeTransfer();
+      } catch (error) { track('transfer_failed'); alert(`❌ ${error.message}`); }
+      finally { elements.progress.hidden = true; elements.input.value = ''; }
     };
     elements.input.addEventListener('change', event => sendFiles(Array.from(event.target.files)));
     const uploadForm = elements.input.closest('form');
@@ -235,6 +264,10 @@
       sendFiles(Array.from(event.dataTransfer.files));
     });
     elements.copy.addEventListener('click', () => navigator.clipboard.writeText(elements.text.value));
+    elements.favorite.addEventListener('click', () => {
+      track('favorite_prompt_clicked');
+      alert(config.language === 'fr' ? 'Utilisez Ctrl+D (ou ⌘+D sur Mac) pour ajouter cette page à vos favoris.' : 'Press Ctrl+D (or ⌘+D on Mac) to bookmark this page.');
+    });
     elements.delete.addEventListener('click', async () => {
       if (confirm('Êtes-vous sûr de vouloir tout supprimer ?')) await deleteSession();
     });

@@ -1,0 +1,207 @@
+{
+  "meta": {
+    "title": "Phone2Laptop — Transférer des fichiers entre téléphone et ordinateur",
+    "description": "Transférez gratuitement vos photos, PDF, vidéos, liens et notes entre votre téléphone et votre ordinateur. Sans application, sans compte et sans câble."
+  },
+  "nav": {
+    "how": "Comment ça marche",
+    "security": "Sécurité",
+    "studio": "Créé par Solenis Studio",
+    "language": "English"
+  },
+  "hero": {
+    "eyebrow": "Transfert de fichiers instantané",
+    "title": "Passez vos fichiers du téléphone à l’ordinateur en quelques secondes.",
+    "subtitle": "Scannez un QR code et transférez immédiatement vos photos, PDF, vidéos, liens ou notes. Sans application, sans compte et sans câble.",
+    "primary": "Afficher mon QR code",
+    "secondary": "Comment ça fonctionne ?",
+    "trust": "Sans compte · Sans installation · Compatible iPhone, Android, Windows et Mac",
+    "limit": "Jusqu’à 50 Mo par fichier"
+  },
+  "assurances": [
+    {
+      "text": "Aucun compte à créer"
+    },
+    {
+      "text": "Aucune application à installer"
+    },
+    {
+      "text": "Transfert dans les deux sens"
+    },
+    {
+      "text": "Compatible avec les navigateurs modernes"
+    },
+    {
+      "text": "Contenus chiffrés côté navigateur"
+    }
+  ],
+  "how": {
+    "title": "Un scan suffit.",
+    "intro": "Phone2Laptop connecte temporairement votre téléphone et votre ordinateur depuis leur navigateur. Aucun paramétrage complexe n’est nécessaire.",
+    "steps": [
+      {
+        "number": "1",
+        "title": "Affichez le QR code",
+        "text": "Ouvrez Phone2Laptop sur votre ordinateur. Un QR code unique est généré pour votre session."
+      },
+      {
+        "number": "2",
+        "title": "Scannez avec votre téléphone",
+        "text": "Scannez le QR code avec l’appareil photo de votre téléphone. Vos deux appareils accèdent à la même session."
+      },
+      {
+        "number": "3",
+        "title": "Envoyez votre contenu",
+        "text": "Transférez un fichier, une photo, un document, un lien ou une note dans le sens de votre choix."
+      }
+    ]
+  },
+  "uses": {
+    "title": "Pour tous les petits transferts du quotidien.",
+    "items": [
+      {
+        "icon": "bi-camera",
+        "title": "Photos et vidéos",
+        "text": "Récupérez rapidement une photo prise avec votre téléphone sur votre ordinateur."
+      },
+      {
+        "icon": "bi-file-earmark-pdf",
+        "title": "PDF et documents",
+        "text": "Envoyez un document vers votre téléphone pour le consulter, le signer ou le partager."
+      },
+      {
+        "icon": "bi-link-45deg",
+        "title": "Notes et liens",
+        "text": "Copiez une adresse, un lien ou un texte entre vos appareils sans passer par votre messagerie."
+      },
+      {
+        "icon": "bi-devices",
+        "title": "Tous les écosystèmes",
+        "text": "Transférez entre Android et Mac, iPhone et Windows, ou toute combinaison disposant d’un navigateur moderne."
+      }
+    ]
+  },
+  "comparison": {
+    "title": "Plus direct qu’un e-mail, un cloud ou un câble.",
+    "intro": "Vous ne devriez pas avoir à vous envoyer un e-mail, chercher un câble ou déposer un fichier dans un cloud pour transférer un document entre deux appareils placés devant vous.",
+    "headers": [
+      {
+        "text": "Critère"
+      },
+      {
+        "text": "Phone2Laptop"
+      },
+      {
+        "text": "E-mail / cloud"
+      },
+      {
+        "text": "Câble"
+      }
+    ],
+    "rows": [
+      {
+        "criterion": "Installation nécessaire",
+        "p2l": "Non",
+        "cloud": "Selon le service",
+        "cable": "Pilote parfois requis"
+      },
+      {
+        "criterion": "Création de compte",
+        "p2l": "Non",
+        "cloud": "Généralement",
+        "cable": "Non"
+      },
+      {
+        "criterion": "Entre plateformes",
+        "p2l": "Navigateur moderne",
+        "cloud": "Selon le service",
+        "cable": "Selon les appareils"
+      },
+      {
+        "criterion": "Stockage persistant",
+        "p2l": "Non prévu",
+        "cloud": "Oui, par défaut",
+        "cable": "Non"
+      },
+      {
+        "criterion": "Transfert bidirectionnel",
+        "p2l": "Oui",
+        "cloud": "Oui",
+        "cable": "Selon les appareils"
+      }
+    ]
+  },
+  "security": {
+    "title": "Vos transferts restent privés.",
+    "intro": "Phone2Laptop a été conçu pour limiter les données traitées et la durée de conservation des contenus transférés.",
+    "items": [
+      {
+        "title": "Aucun profil utilisateur",
+        "text": "Aucun compte n’est nécessaire. Phone2Laptop ne crée pas de profil personnel associé à vos transferts."
+      },
+      {
+        "title": "Contenus chiffrés",
+        "text": "Fichiers et notes sont chiffrés dans votre navigateur avec AES-GCM avant leur envoi. La clé est transmise dans le fragment du lien de session et n’est pas envoyée à notre serveur."
+      },
+      {
+        "title": "Conservation temporaire",
+        "text": "Les contenus restent chiffrés sur le serveur. Après le premier fichier envoyé, la session expire 30 minutes plus tard. Vous pouvez aussi la supprimer immédiatement."
+      },
+      {
+        "title": "Périmètre transparent",
+        "text": "Une note seule ne déclenche actuellement pas le délai de 30 minutes. N’utilisez pas le service comme espace de stockage et supprimez la session après usage."
+      }
+    ]
+  },
+  "benefits": {
+    "title": "Pourquoi Phone2Laptop simplifie vos transferts",
+    "items": [
+      {
+        "text": "Aucun logiciel à installer"
+      },
+      {
+        "text": "Aucun compte à configurer"
+      },
+      {
+        "text": "Un navigateur moderne suffit sur les deux appareils"
+      }
+    ]
+  },
+  "studio": {
+    "eyebrow": "Un produit Solenis Studio",
+    "title": "Vous venez d’utiliser un MVP conçu pour aller directement à l’essentiel.",
+    "text1": "Phone2Laptop a été imaginé et développé par Solenis Studio pour résoudre une friction simple avec une expérience rapide, utile et sans complexité inutile.",
+    "text2": "Nous accompagnons les entrepreneurs et les entreprises dans la conception et le développement de leurs SaaS, applications métier et produits digitaux, du cadrage jusqu’à la mise en production.",
+    "primary": "Parler de mon projet",
+    "secondary": "Découvrir Solenis Studio"
+  },
+  "donate": {
+    "title": "Phone2Laptop vous est utile ?",
+    "text": "Le service est gratuit et sans publicité. Votre soutien contribue à financer son hébergement, sa maintenance et ses prochaines améliorations.",
+    "cta": "Soutenir le projet"
+  },
+  "footer": {
+    "support": "Soutenir le projet",
+    "notice": "Les pages juridiques et la documentation de sécurité ne sont pas encore publiées."
+  },
+  "exchange": {
+    "title": "Connectez vos appareils",
+    "desktop": "Scannez ce QR code avec votre téléphone, puis sélectionnez un fichier ou saisissez une note.",
+    "mobile": "Ouvrez phone2laptop.com sur votre ordinateur, puis scannez le QR code affiché.",
+    "qrAlt": "Lien de session à ouvrir sur l’autre appareil",
+    "waiting": "Le délai de suppression démarrera après l’envoi du premier fichier.",
+    "encrypted": "Les contenus sont chiffrés dans votre navigateur.",
+    "files": "Partager des fichiers",
+    "choose": "Choisir des fichiers",
+    "drop": "Glissez-déposez aussi possible — 50 Mo maximum par fichier",
+    "sending": "Envoi en cours…",
+    "notes": "Partager une note ou un lien",
+    "placeholder": "Écrivez une note ou collez un lien…",
+    "copy": "Copier",
+    "delete": "Tout supprimer",
+    "successTitle": "Transfert terminé.",
+    "successText": "Phone2Laptop est un produit conçu par Solenis Studio.",
+    "successLink": "Vous avez une idée de SaaS ou d’application ? Parlons-en.",
+    "favorite": "Ajouter Phone2Laptop à mes favoris"
+  }
+}

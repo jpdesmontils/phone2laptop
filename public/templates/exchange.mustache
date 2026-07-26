@@ -1,0 +1,13 @@
+<main id="main-content" class="exchange section-pad">
+ <div class="container">
+  <div class="section-head centered"><p class="eyebrow">Phone2Laptop</p><h1>{{exchange.title}}</h1><p class="desktop-instruction">{{exchange.desktop}}</p><p class="mobile-instruction">{{exchange.mobile}}</p></div>
+  <div class="qr-panel"><div id="session-qr" role="img" aria-label="{{exchange.qrAlt}}"></div><a id="session-link" class="text-link" href="{{shareUrl}}">{{exchange.qrAlt}}</a></div>
+  <div class="status" role="status" aria-live="polite"><i class="bi bi-shield-check" aria-hidden="true"></i><span>{{exchange.encrypted}} <span id="expiry-label">{{exchange.waiting}}</span><strong id="expiry-countdown"></strong></span></div>
+  <div class="exchange-grid">
+   <section class="transfer-card"><h2><i class="bi bi-file-earmark-arrow-up" aria-hidden="true"></i> {{exchange.files}}</h2><form id="upload-form"><label for="file-input" class="btn btn-primary">{{exchange.choose}}</label><input id="file-input" class="visually-hidden" type="file" multiple><p>{{exchange.drop}}</p><div id="upload-progress" class="progress-wrap" hidden><div class="progress" role="progressbar" aria-label="{{exchange.sending}}" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div id="progress-bar"></div></div><span>{{exchange.sending}}</span></div></form><ul id="file-list" class="file-list" aria-live="polite"></ul></section>
+   <section class="transfer-card"><div class="card-heading"><h2><i class="bi bi-card-text" aria-hidden="true"></i> {{exchange.notes}}</h2><button id="btn-copy" class="btn btn-outline-primary" type="button">{{exchange.copy}}</button></div><label class="visually-hidden" for="shared-text">{{exchange.notes}}</label><textarea id="shared-text" placeholder="{{exchange.placeholder}}"></textarea></section>
+  </div>
+  <div class="delete-row"><button id="btn-delete" class="btn btn-danger-outline" type="button"><i class="bi bi-trash" aria-hidden="true"></i> {{exchange.delete}}</button></div>
+  <aside id="success-prompt" class="success-prompt" hidden aria-live="polite"><div><strong>{{exchange.successTitle}}</strong><span>{{exchange.successText}}</span></div><a href="{{studioUrl}}" target="_blank" rel="noopener" data-event="solenis_cta_clicked">{{exchange.successLink}}</a><button id="favorite-prompt" class="btn btn-outline-primary" type="button">{{exchange.favorite}}</button></aside>
+ </div>
+</main>

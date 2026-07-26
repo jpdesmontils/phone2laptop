@@ -8,8 +8,9 @@ $session = open_session($token);
 if (!$session) json_error(410, 'Session expirée');
 header('X-Session-Expires-At: ' . ($session['expiresAt'] === null ? '' : $session['expiresAt'] * 1000));
 
+$publicRoot = rtrim(dirname(dirname($_SERVER['PHP_SELF'])), '/');
 $base = ((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http')
-    . '://' . $_SERVER['HTTP_HOST'] . dirname(dirname($_SERVER['PHP_SELF']))
+    . '://' . $_SERVER['HTTP_HOST'] . $publicRoot
     . '/api/download.php?token=' . $token . '&name=';
 $list = [];
 foreach (glob($session['dir'] . '/*.enc') ?: [] as $file) {
