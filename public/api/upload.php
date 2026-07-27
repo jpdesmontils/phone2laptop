@@ -3,7 +3,7 @@ require_once dirname(__DIR__) . '/includes/session.php';
 require_once dirname(__DIR__) . '/includes/upload-counter.php';
 header('Content-Type: application/json');
 
-function upload_error(int $code, string $message): void
+function upload_error(int $code, string $message)
 {
     http_response_code($code);
     echo json_encode(['ok' => false, 'error' => $message]);

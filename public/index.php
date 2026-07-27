@@ -1,6 +1,4 @@
 <?php
-define('PHONE2LAPTOP_APP', true);
-
 require_once __DIR__ . '/includes/session.php';
 require_once __DIR__ . '/includes/upload-counter.php';
 require_once __DIR__ . '/includes/mustache.php';
@@ -27,7 +25,6 @@ $context = $text + [
     'locale_code' => $language,
     'is_fr' => $language === 'fr',
     'is_en' => $language === 'en',
-    'has_session' => $hasParam,
     'landing' => !$hasParam,
     'base_url' => $baseUrl,
     'start_url' => $baseUrl . '/?token=' . rawurlencode($token),

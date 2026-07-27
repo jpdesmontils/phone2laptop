@@ -13,9 +13,14 @@ function render_mustache(string $template, array $context): string
             $visible = !empty($value);
             if ($match[1] === '^') return $visible ? '' : render_mustache($match[3], $context);
             if (!$visible) return '';
-            if (is_array($value) && array_is_list($value)) {
+            if (is_array($value) && mustache_is_list($value)) {
                 return implode('', array_map(
-                    fn ($item) => render_mustache($match[3], is_array($item) ? $item + $context : ['.' => $item] + $context),
+                    function ($item) use ($match, $context) {
+                        return render_mustache(
+                            $match[3],
+                            is_array($item) ? $item + $context : ['.' => $item] + $context
+                        );
+                    },
                     $value
                 ));
             }
@@ -23,10 +28,22 @@ function render_mustache(string $template, array $context): string
         }, $template);
     }
 
-    $template = preg_replace_callback('/{{{\s*([\w.]+)\s*}}}/',
-        fn (array $match) => (string) mustache_value($context, $match[1]), $template);
-    return preg_replace_callback('/{{\s*([\w.]+)\s*}}/',
-        fn (array $match) => htmlspecialchars((string) mustache_value($context, $match[1]), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'), $template);
+    $template = preg_replace_callback('/{{{\s*([\w.]+)\s*}}}/', function (array $match) use ($context) {
+        return (string) mustache_value($context, $match[1]);
+    }, $template);
+    return preg_replace_callback('/{{\s*([\w.]+)\s*}}/', function (array $match) use ($context) {
+        return htmlspecialchars(
+            (string) mustache_value($context, $match[1]),
+            ENT_QUOTES | ENT_SUBSTITUTE,
+            'UTF-8'
+        );
+    }, $template);
+}
+
+function mustache_is_list(array $value): bool
+{
+    if ($value === []) return true;
+    return array_keys($value) === range(0, count($value) - 1);
 }
 
 function mustache_value(array $context, string $path)
