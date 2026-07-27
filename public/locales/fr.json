@@ -1,0 +1,117 @@
+{
+  "meta": {
+    "title": "Phone2Laptop – Transferts instantanés entre téléphone et ordinateur",
+    "description": "Échangez fichiers, photos, vidéos et texte entre smartphone et ordinateur en un seul scan. Gratuit, rapide et sécurisé."
+  },
+  "language": {
+    "label": "Langue",
+    "fr": "Français",
+    "en": "English"
+  },
+  "nav": {
+    "why": "Pourquoi ?",
+    "about": "À propos",
+    "contribute": "Contribuer",
+    "start": "Commencer"
+  },
+  "hero": {
+    "title": "Transférez vos fichiers<br>entre téléphone et ordinateur",
+    "accent": "en 1 scan. Sans rien installer.",
+    "intro": "Oubliez les e-mails à vous-même, les messages WhatsApp ou les clés USB.<br><strong>phone2laptop</strong> crée un lien temporaire et sécurisé — <em>effacé automatiquement après 30 minutes</em>.",
+    "benefit1": "📱 ↔ 💻 Transfert <strong>instantané dans les deux sens</strong>",
+    "benefit2": "🖼️ 📄 Fichiers, photos, vidéos, notes… <strong>tout est synchronisé en temps réel</strong>",
+    "benefit3": "🚫 Aucun compte, aucune pub, <strong>100 % anonyme</strong>",
+    "benefit4": "🔒 <strong>Auto-suppression</strong> après 30 min — vos données ne traînent pas",
+    "start": "Commencer maintenant",
+    "reassurance": "Votre session s’efface automatiquement — même si vous oubliez de tout supprimer.",
+    "counter_aria": "Nombre de fichiers échangés",
+    "counter": "fichiers échangés",
+    "how": "Comment ça marche ?",
+    "step1_title": "Ouvrez cette page sur votre ordinateur",
+    "step1_text": "Un QR code sécurisé apparaît instantanément.",
+    "step2_title": "Scannez-le avec votre téléphone",
+    "step2_text": "Votre mobile se connecte <strong>sans mot de passe</strong>.",
+    "step3_title": "Partagez librement",
+    "step3_text": "Glissez un fichier, tapez une note… <strong>ça apparaît en direct sur l’autre écran</strong>."
+  },
+  "why": {
+    "title": "Pourquoi phone2laptop existe ?",
+    "lead": "Parce que transférer un fichier de son téléphone à son ordinateur ne devrait <strong>pas être une corvée</strong>.",
+    "problem": "❌ Le problème aujourd’hui",
+    "p1": "<strong>WhatsApp Web</strong> met 10 à 30 secondes à charger… pour envoyer une photo à soi-même.",
+    "p2": "<strong>Email</strong> : pièces jointes limitées, spam, perte de temps.",
+    "p3": "<strong>Cloud (Google Drive, iCloud…)</strong> : compte requis, synchronisation lente, stockage limité.",
+    "p4": "<strong>Câble USB</strong> : où est-il ? Et si on est sur Mac avec un adaptateur introuvable ?",
+    "result": "Résultat : on perd du temps, on s’énerve et on oublie ce qu’on voulait transférer.",
+    "solution": "✅ Notre solution",
+    "s1": "<strong>Instantané</strong> : scan → partage. Moins de 5 secondes.",
+    "s2": "<strong>100 % gratuit</strong>, sans compte, sans pub, sans limite.",
+    "s3": "<strong>Aucune donnée personnelle</strong> n’est collectée, stockée ou analysée.",
+    "s4": "<strong>Chiffrement de bout en bout</strong> : la clé reste sur vos appareils, nous ne pouvons pas accéder à vos fichiers ni à vos notes.",
+    "s5": "<strong>Auto-suppression</strong> après 30 minutes — vos fichiers disparaissent seuls.",
+    "s6": "<strong>Open source</strong> : transparence totale, sécurité vérifiable."
+  },
+  "exchange": {
+    "title": "Scannez pour synchroniser un autre appareil",
+    "qr_aria": "QR Code – Ouvrir sur mobile",
+    "sync": "Synchronisation en temps réel entre appareils.",
+    "security": "Données chiffrées de bout en bout —",
+    "expiry_pending": "le délai de suppression démarrera au premier fichier",
+    "files": "📁 Partager vos fichiers",
+    "choose": "Choisir des fichiers",
+    "drop": "Glissez-déposez aussi possible<br>(max. 50 Mo/fichier)",
+    "uploading": "Envoi en cours…",
+    "notes": "📝 Partager vos notes",
+    "copy": "Copier",
+    "placeholder": "Écrivez un message…",
+    "delete": "Tout supprimer"
+  },
+  "reasons": {
+    "title": "Pourquoi des milliers d’utilisateurs l’adorent",
+    "r1": "⏱️ Zéro perte de temps",
+    "r1t": "Plus besoin de chercher un câble, d’ouvrir Gmail ou de se connecter à Dropbox.",
+    "r2": "🛡️ Confidentialité garantie",
+    "r2t": "Vos fichiers sont chiffrés de bout en bout et tout disparaît après 30 min.",
+    "r3": "✨ Fonctionne partout",
+    "r3t": "Chrome, Safari, Firefox… Sur Windows, Mac, Android, iOS. <strong>Aucune app à télécharger.</strong>",
+    "r4": "🆓 100 % gratuit, pour toujours",
+    "r4t": "Pas de version pro, pas de limite cachée. Juste un outil simple, honnête et utile."
+  },
+  "donate": {
+    "why": "Pourquoi est-ce gratuit ?",
+    "about": "<strong>phone2laptop</strong> a été créé par <a href=\"https://solenis.studio\" target=\"_blank\" rel=\"noopener\" class=\"text-decoration-none\">Solenis Studio</a>, une agence spécialisée dans le développement de MVP (Minimum Viable Product).",
+    "mission": "Ce service est un vecteur de communication pour nous : il démontre notre philosophie — simplicité, efficacité, respect de la vie privée. Nous croyons qu’un bon outil doit être accessible à tous, sans friction.",
+    "love": "❤️ Vous aimez phone2laptop ?",
+    "support": "Soutenez son développement ! Vos dons nous permettent de maintenir l’infrastructure, d’améliorer la sécurité et de garder le service gratuit.",
+    "button": "Faire un don",
+    "thanks": "Tous les dons sont libres, sans contrepartie. Merci de votre confiance !"
+  },
+  "footer": {
+    "about_title": "À propos de Solenis Studio",
+    "about": "Nous sommes une agence de conseil et de développement logiciel spécialisée dans la création de MVP. Nous transformons vos idées en produits concrets en moins de 3 mois grâce à une méthodologie innovante et des composants open source réutilisables.",
+    "links": "Liens utiles",
+    "why": "Pourquoi phone2laptop",
+    "features": "Fonctionnalités",
+    "contribute": "Contribuer",
+    "tagline": "Outil open source • Sécurisé • Éphémère",
+    "privacy": "Données auto-détruites après 30 minutes • Aucun stockage persistant"
+  },
+  "js": {
+    "invalidKey": "Clé de session invalide",
+    "expired": "Cette session a expiré.",
+    "serverError": "Erreur serveur ({status})",
+    "kilobyte": "Ko",
+    "download": "Télécharger {name}",
+    "unreadable": "Fichier chiffré illisible :",
+    "sessionExpired": "session expirée",
+    "qrUnavailable": "QR Code indisponible",
+    "qrError": "Le générateur de QR Code est indisponible.",
+    "uploadError": "Erreur : {message}",
+    "deleteConfirm": "Êtes-vous sûr de vouloir tout supprimer ?",
+    "openError": "Impossible d’ouvrir la session chiffrée : {message}"
+  },
+  "errors": {
+    "invalid_session": "Session invalide",
+    "create_session": "Impossible de créer la session"
+  }
+}

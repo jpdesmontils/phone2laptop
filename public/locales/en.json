@@ -1,0 +1,117 @@
+{
+  "meta": {
+    "title": "Phone2Laptop – Instant transfers between phone and computer",
+    "description": "Exchange files, photos, videos and text between your phone and computer with one scan. Free, fast and secure."
+  },
+  "language": {
+    "label": "Language",
+    "fr": "Français",
+    "en": "English"
+  },
+  "nav": {
+    "why": "Why?",
+    "about": "About",
+    "contribute": "Contribute",
+    "start": "Start"
+  },
+  "hero": {
+    "title": "Transfer files<br>between your phone and computer",
+    "accent": "in 1 scan. Nothing to install.",
+    "intro": "Forget emailing yourself, WhatsApp messages and USB drives.<br><strong>phone2laptop</strong> creates a temporary, secure link — <em>automatically erased after 30 minutes</em>.",
+    "benefit1": "📱 ↔ 💻 <strong>Instant two-way</strong> transfer",
+    "benefit2": "🖼️ 📄 Files, photos, videos, notes… <strong>everything syncs in real time</strong>",
+    "benefit3": "🚫 No account, no ads, <strong>100% anonymous</strong>",
+    "benefit4": "🔒 <strong>Automatic deletion</strong> after 30 min — your data never lingers",
+    "start": "Start now",
+    "reassurance": "Your session is erased automatically — even if you forget to delete everything.",
+    "counter_aria": "Number of files exchanged",
+    "counter": "files exchanged",
+    "how": "How does it work?",
+    "step1_title": "Open this page on your computer",
+    "step1_text": "A secure QR code appears instantly.",
+    "step2_title": "Scan it with your phone",
+    "step2_text": "Your phone connects <strong>without a password</strong>.",
+    "step3_title": "Share freely",
+    "step3_text": "Drop a file or type a note… <strong>it appears live on the other screen</strong>."
+  },
+  "why": {
+    "title": "Why does phone2laptop exist?",
+    "lead": "Because transferring a file from your phone to your computer should <strong>not be a chore</strong>.",
+    "problem": "❌ The problem today",
+    "p1": "<strong>WhatsApp Web</strong> takes 10 to 30 seconds to load… just to send yourself a photo.",
+    "p2": "<strong>Email</strong>: attachment limits, spam and wasted time.",
+    "p3": "<strong>Cloud (Google Drive, iCloud…)</strong>: account required, slow syncing, limited storage.",
+    "p4": "<strong>USB cable</strong>: where is it? And what if your Mac adapter is missing?",
+    "result": "The result: wasted time, frustration and forgotten files.",
+    "solution": "✅ Our solution",
+    "s1": "<strong>Instant</strong>: scan → share. Under 5 seconds.",
+    "s2": "<strong>100% free</strong>, with no account, ads or limits.",
+    "s3": "<strong>No personal data</strong> is collected, stored or analyzed.",
+    "s4": "<strong>End-to-end encryption</strong>: the key stays on your devices, so we cannot access your files or notes.",
+    "s5": "<strong>Automatic deletion</strong> after 30 minutes — your files disappear on their own.",
+    "s6": "<strong>Open source</strong>: full transparency and verifiable security."
+  },
+  "exchange": {
+    "title": "Scan to sync another device",
+    "qr_aria": "QR code – Open on mobile",
+    "sync": "Real-time synchronization between devices.",
+    "security": "End-to-end encrypted data —",
+    "expiry_pending": "the deletion timer will start with the first file",
+    "files": "📁 Share your files",
+    "choose": "Choose files",
+    "drop": "You can also drag and drop<br>(max. 50 MB/file)",
+    "uploading": "Uploading…",
+    "notes": "📝 Share your notes",
+    "copy": "Copy",
+    "placeholder": "Write a message…",
+    "delete": "Delete everything"
+  },
+  "reasons": {
+    "title": "Why thousands of users love it",
+    "r1": "⏱️ No wasted time",
+    "r1t": "No need to find a cable, open Gmail or sign into Dropbox.",
+    "r2": "🛡️ Privacy guaranteed",
+    "r2t": "Your files are end-to-end encrypted and everything disappears after 30 min.",
+    "r3": "✨ Works everywhere",
+    "r3t": "Chrome, Safari, Firefox… On Windows, Mac, Android and iOS. <strong>No app to download.</strong>",
+    "r4": "🆓 100% free, forever",
+    "r4t": "No pro version or hidden limit. Just a simple, honest and useful tool."
+  },
+  "donate": {
+    "why": "Why is it free?",
+    "about": "<strong>phone2laptop</strong> was created by <a href=\"https://solenis.studio\" target=\"_blank\" rel=\"noopener\" class=\"text-decoration-none\">Solenis Studio</a>, an agency specializing in MVP (Minimum Viable Product) development.",
+    "mission": "This service helps introduce our work: it demonstrates our philosophy — simplicity, efficiency and privacy. We believe a good tool should be accessible to everyone without friction.",
+    "love": "❤️ Enjoying phone2laptop?",
+    "support": "Support its development! Your donations help us maintain the infrastructure, improve security and keep the service free.",
+    "button": "Donate",
+    "thanks": "All donations are voluntary with no reward expected. Thank you for your trust!"
+  },
+  "footer": {
+    "about_title": "About Solenis Studio",
+    "about": "We are a software consulting and development agency specializing in MVP creation. We turn ideas into real products in under 3 months using an innovative method and reusable open-source components.",
+    "links": "Useful links",
+    "why": "Why phone2laptop",
+    "features": "Features",
+    "contribute": "Contribute",
+    "tagline": "Open source • Secure • Ephemeral",
+    "privacy": "Data automatically deleted after 30 minutes • No persistent storage"
+  },
+  "js": {
+    "invalidKey": "Invalid session key",
+    "expired": "This session has expired.",
+    "serverError": "Server error ({status})",
+    "kilobyte": "KB",
+    "download": "Download {name}",
+    "unreadable": "Unreadable encrypted file:",
+    "sessionExpired": "session expired",
+    "qrUnavailable": "QR Code unavailable",
+    "qrError": "The QR Code generator is unavailable.",
+    "uploadError": "Error: {message}",
+    "deleteConfirm": "Are you sure you want to delete everything?",
+    "openError": "Unable to open the encrypted session: {message}"
+  },
+  "errors": {
+    "invalid_session": "Invalid session",
+    "create_session": "Unable to create the session"
+  }
+}
