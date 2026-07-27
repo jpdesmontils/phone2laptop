@@ -2,6 +2,11 @@
   'use strict';
 
   const config = window.P2L;
+  const messages = config?.i18n || {};
+  const message = (key, replacements = {}) => Object.entries(replacements).reduce(
+    (text, [name, value]) => text.replace(`{${name}}`, value),
+    messages[key] || key
+  );
   const encoder = new TextEncoder();
   const decoder = new TextDecoder();
   const elements = {
@@ -39,7 +44,7 @@
       history.replaceState(null, '', `${location.pathname}${location.search}#${params}`);
     }
     const rawKey = decodeBase64Url(encodedKey);
-    if (rawKey.length !== 32) throw new Error('Clé de session invalide');
+    if (rawKey.length !== 32) throw new Error(message('invalidKey'));
     return { encodedKey, key: await crypto.subtle.importKey('raw', rawKey, 'AES-GCM', false, ['encrypt', 'decrypt']) };
   }
 
@@ -74,7 +79,7 @@
 
   async function api(url, options) {
     const response = await fetch(url, options);
-    if (!response.ok) throw new Error(response.status === 410 ? 'Cette session a expiré.' : `Erreur serveur (${response.status})`);
+    if (!response.ok) throw new Error(response.status === 410 ? message('expired') : message('serverError', { status: response.status }));
     return response;
   }
 
@@ -88,13 +93,13 @@
     name.textContent = file.name;
     const size = document.createElement('small');
     size.className = 'text-muted';
-    size.textContent = `${Math.round(file.content.byteLength / 1024)} Ko`;
+    size.textContent = `${Math.round(file.content.byteLength / 1024)} ${message('kilobyte')}`;
     label.append(name, size);
     const download = document.createElement('button');
     download.className = 'btn btn-sm btn-outline-primary';
     download.type = 'button';
     download.textContent = '↓';
-    download.setAttribute('aria-label', `Télécharger ${file.name}`);
+    download.setAttribute('aria-label', message('download', { name: file.name }));
     download.addEventListener('click', () => {
       const url = URL.createObjectURL(new Blob([file.content], { type: file.type }));
       const anchor = document.createElement('a');
@@ -118,7 +123,7 @@
         const encrypted = await (await api(remote.url)).arrayBuffer();
         addFileRow(unpackFile(await decryptBytes(key, encrypted)));
       } catch (error) {
-        console.error('Fichier chiffré illisible :', remote.id, error);
+        console.error(message('unreadable'), remote.id, error);
       }
     }
   }
@@ -189,7 +194,7 @@
         try { await deleteSession(); } catch (error) { console.error(error); }
         elements.input.disabled = true;
         elements.text.disabled = true;
-        elements.countdown.textContent = 'session expirée';
+        elements.countdown.textContent = message('sessionExpired');
       }
     };
     update();
@@ -202,8 +207,8 @@
     if (typeof QRCode === 'function') {
       new QRCode(elements.qr, { text: shareUrl, width: 180, height: 180, correctLevel: QRCode.CorrectLevel.M });
     } else {
-      elements.qr.textContent = 'QR Code indisponible';
-      console.error('Le générateur de QR Code est indisponible.');
+      elements.qr.textContent = message('qrUnavailable');
+      console.error(message('qrError'));
     }
     startCountdown();
     await Promise.all([refreshFiles(key), loadText(key)]);
@@ -224,7 +229,7 @@
           elements.progressBar.style.width = `${Math.round(((index + 1) / files.length) * 100)}%`;
         }
         await refreshFiles(key);
-      } catch (error) { alert(`❌ Erreur : ${error.message}`); }
+      } catch (error) { alert(`❌ ${message('uploadError', { message: error.message })}`); }
       finally { elements.progress.style.display = 'none'; elements.input.value = ''; }
     };
     elements.input.addEventListener('change', event => sendFiles(Array.from(event.target.files)));
@@ -236,12 +241,12 @@
     });
     elements.copy.addEventListener('click', () => navigator.clipboard.writeText(elements.text.value));
     elements.delete.addEventListener('click', async () => {
-      if (confirm('Êtes-vous sûr de vouloir tout supprimer ?')) await deleteSession();
+      if (confirm(message('deleteConfirm'))) await deleteSession();
     });
   }
 
   initialize().catch(error => {
     console.error(error);
-    alert(`Impossible d’ouvrir la session chiffrée : ${error.message}`);
+    alert(message('openError', { message: error.message }));
   });
 })();
