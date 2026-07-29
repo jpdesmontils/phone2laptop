@@ -58,6 +58,31 @@ if (!is_dir($dir)) {
 }
 
 switch ($action) {
+    case 'delete-file':
+        $name = basename($payload['name'] ?? '');
+        if (!preg_match('/^[a-f0-9-]{36}\.enc$/', $name)) {
+            http_response_code(400);
+            header('Content-Type: application/json');
+            echo json_encode(['error' => 'Nom de fichier invalide']);
+            exit;
+        }
+        $path = $dir . '/' . $name;
+        if (!is_file($path)) {
+            http_response_code(404);
+            header('Content-Type: application/json');
+            echo json_encode(['error' => 'Fichier introuvable']);
+            exit;
+        }
+        if (!unlink($path)) {
+            http_response_code(500);
+            header('Content-Type: application/json');
+            echo json_encode(['error' => 'Impossible de supprimer le fichier']);
+            exit;
+        }
+        header('Content-Type: application/json');
+        echo json_encode(['ok' => true]);
+        break;
+
     case 'delete':
         if (!delete_session_directory($dir)) {
             http_response_code(500);

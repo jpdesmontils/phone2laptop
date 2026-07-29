@@ -36,7 +36,10 @@
     "notes": "Notes",
     "copy": "Copier",
     "placeholder": "Écrivez un message…",
-    "delete": "Tout supprimer"
+    "delete": "Tout supprimer",
+    "deleteModalTitle": "Confirmer la suppression",
+    "cancel": "Annuler",
+    "confirmDelete": "Supprimer"
   },
   "how": {
     "title": "Un scan suffit.",
@@ -154,12 +157,15 @@
     "serverError": "Erreur serveur ({status})",
     "kilobyte": "Ko",
     "download": "Télécharger {name}",
+    "deleteFile": "Supprimer {name}",
+    "deleteFileConfirm": "Voulez-vous vraiment supprimer « {name} » ? Cette action est irréversible.",
+    "deleteError": "Suppression impossible : {message}",
     "unreadable": "Fichier chiffré illisible :",
     "sessionExpired": "session expirée",
     "qrUnavailable": "QR Code indisponible",
     "qrError": "Le générateur de QR Code est indisponible.",
     "uploadError": "Erreur : {message}",
-    "deleteConfirm": "Êtes-vous sûr de vouloir tout supprimer ?",
+    "deleteConfirm": "Voulez-vous vraiment supprimer tous les fichiers et la note partagée ? Cette action est irréversible.",
     "openError": "Impossible d’ouvrir la session chiffrée : {message}"
   },
   "errors": {
