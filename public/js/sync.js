@@ -19,7 +19,10 @@
     progressBar: document.getElementById('progress-bar'),
     countdown: document.getElementById('expiry-countdown'),
     expiryLabel: document.getElementById('expiry-label'),
-    qr: document.getElementById('session-qr')
+    qr: document.getElementById('session-qr'),
+    deleteModal: document.getElementById('delete-modal'),
+    deleteModalMessage: document.getElementById('delete-modal-message'),
+    deleteModalConfirm: document.getElementById('delete-modal-confirm')
   };
   if (!config || Object.values(elements).some(element => !element)) return;
 
@@ -83,7 +86,9 @@
     return response;
   }
 
-  function addFileRow(file) {
+  const fileRows = new Map();
+
+  function addFileRow(remote, file) {
     const item = document.createElement('li');
     item.className = 'list-group-item d-flex justify-content-between align-items-center gap-3';
     const label = document.createElement('div');
@@ -95,6 +100,8 @@
     size.className = 'text-muted';
     size.textContent = `${Math.round(file.content.byteLength / 1024)} ${message('kilobyte')}`;
     label.append(name, size);
+    const actions = document.createElement('div');
+    actions.className = 'd-flex gap-2 flex-shrink-0';
     const download = document.createElement('button');
     download.className = 'btn btn-sm btn-outline-primary';
     download.type = 'button';
@@ -108,24 +115,54 @@
       anchor.click();
       setTimeout(() => URL.revokeObjectURL(url), 1000);
     });
-    item.append(label, download);
+    const remove = document.createElement('button');
+    remove.className = 'btn btn-sm btn-outline-danger';
+    remove.type = 'button';
+    remove.innerHTML = '<i class="bi bi-trash" aria-hidden="true"></i>';
+    remove.setAttribute('aria-label', message('deleteFile', { name: file.name }));
+    remove.addEventListener('click', () => showDeleteConfirmation(
+      message('deleteFileConfirm', { name: file.name }),
+      async () => {
+        await deleteFile(remote.id);
+        item.remove();
+        fileRows.delete(remote.id);
+      }
+    ));
+    actions.append(download, remove);
+    item.append(label, actions);
     elements.list.append(item);
+    fileRows.set(remote.id, item);
   }
 
-  async function refreshFiles(key) {
+  let filesRefreshPromise = null;
+  async function performFilesRefresh(key) {
     const response = await api(`${config.apiBase}files.php?token=${encodeURIComponent(config.token)}`);
     const expiresAt = response.headers.get('X-Session-Expires-At');
     config.expiresAt = expiresAt ? Number(expiresAt) : null;
     const files = await response.json();
-    elements.list.replaceChildren();
+    const remoteIds = new Set(files.map(file => file.id));
+    fileRows.forEach((row, id) => {
+      if (!remoteIds.has(id)) {
+        row.remove();
+        fileRows.delete(id);
+      }
+    });
     for (const remote of files) {
+      if (fileRows.has(remote.id)) continue;
       try {
         const encrypted = await (await api(remote.url)).arrayBuffer();
-        addFileRow(unpackFile(await decryptBytes(key, encrypted)));
+        addFileRow(remote, unpackFile(await decryptBytes(key, encrypted)));
       } catch (error) {
         console.error(message('unreadable'), remote.id, error);
       }
     }
+  }
+
+  function refreshFiles(key) {
+    if (!filesRefreshPromise) {
+      filesRefreshPromise = performFilesRefresh(key).finally(() => { filesRefreshPromise = null; });
+    }
+    return filesRefreshPromise;
   }
 
   let lastText = '';
@@ -172,8 +209,40 @@
       body: JSON.stringify({ token: config.token, action: 'delete' })
     });
     elements.list.replaceChildren();
+    fileRows.clear();
     elements.text.value = '';
   }
+
+  async function deleteFile(name) {
+    await api(`${config.apiBase}close.php`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token: config.token, action: 'delete-file', name })
+    });
+  }
+
+  const deleteModal = new bootstrap.Modal(elements.deleteModal);
+  let pendingDeletion = null;
+  function showDeleteConfirmation(text, deletion) {
+    elements.deleteModalMessage.textContent = text;
+    pendingDeletion = deletion;
+    deleteModal.show();
+  }
+
+  elements.deleteModal.addEventListener('hidden.bs.modal', () => { pendingDeletion = null; });
+  elements.deleteModalConfirm.addEventListener('click', async () => {
+    if (!pendingDeletion) return;
+    const deletion = pendingDeletion;
+    pendingDeletion = null;
+    elements.deleteModalConfirm.disabled = true;
+    try {
+      await deletion();
+      deleteModal.hide();
+    } catch (error) {
+      alert(message('deleteError', { message: error.message }));
+    } finally {
+      elements.deleteModalConfirm.disabled = false;
+    }
+  });
 
   function startCountdown() {
     let deletionRequested = false;
@@ -240,9 +309,7 @@
       sendFiles(Array.from(event.dataTransfer.files));
     });
     elements.copy.addEventListener('click', () => navigator.clipboard.writeText(elements.text.value));
-    elements.delete.addEventListener('click', async () => {
-      if (confirm(message('deleteConfirm'))) await deleteSession();
-    });
+    elements.delete.addEventListener('click', () => showDeleteConfirmation(message('deleteConfirm'), deleteSession));
   }
 
   initialize().catch(error => {

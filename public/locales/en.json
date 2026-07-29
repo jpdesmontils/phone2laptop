@@ -36,7 +36,10 @@
     "notes": "Notes",
     "copy": "Copy",
     "placeholder": "Write a message…",
-    "delete": "Delete everything"
+    "delete": "Delete everything",
+    "deleteModalTitle": "Confirm deletion",
+    "cancel": "Cancel",
+    "confirmDelete": "Delete"
   },
   "how": {
     "title": "One scan is all it takes.",
@@ -154,12 +157,15 @@
     "serverError": "Server error ({status})",
     "kilobyte": "KB",
     "download": "Download {name}",
+    "deleteFile": "Delete {name}",
+    "deleteFileConfirm": "Do you really want to delete “{name}”? This action cannot be undone.",
+    "deleteError": "Unable to delete: {message}",
     "unreadable": "Unreadable encrypted file:",
     "sessionExpired": "session expired",
     "qrUnavailable": "QR Code unavailable",
     "qrError": "The QR Code generator is unavailable.",
     "uploadError": "Error: {message}",
-    "deleteConfirm": "Are you sure you want to delete everything?",
+    "deleteConfirm": "Do you really want to delete all files and the shared note? This action cannot be undone.",
     "openError": "Unable to open the encrypted session: {message}"
   },
   "errors": {
