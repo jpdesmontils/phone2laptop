@@ -32,6 +32,7 @@ $context = $text + [
     'en_url' => $baseUrl . '/' . $query . 'en',
     'upload_count' => number_format(readUploadCount(), 0, $language === 'fr' ? ',' : '.', '&nbsp;'),
     'year' => date('Y'),
+    'sync_js_version' => filemtime(__DIR__ . '/js/sync.js'),
     'p2l_config' => json_encode([
         'token' => $token,
         'apiBase' => $baseUrl . '/api/',

@@ -61,6 +61,11 @@
   .session-status{background:var(--p2l-tint);border:1px solid var(--p2l-line);color:var(--p2l-ink-soft);font-size:.85rem;border-radius:.6rem}
   .panel{border:1px solid var(--p2l-line);border-radius:.85rem;padding:1.4rem}
   #shared-text{height:200px;resize:vertical}
+  .file-preview{width:3.5rem;height:3.5rem;border:1px solid var(--p2l-line);border-radius:.45rem;background:var(--p2l-tint);overflow:hidden;display:flex;align-items:center;justify-content:center;flex:0 0 auto;color:var(--p2l-ink-soft);font-size:1.5rem;padding:0}
+  .file-preview:hover{border-color:var(--bs-primary);color:var(--bs-primary)}
+  .file-preview img{width:100%;height:100%;object-fit:cover}
+  .document-preview{width:100%;height:min(72vh,760px);border:0;display:block}
+  .document-preview-message{min-height:12rem}
 
   .section-block{padding:3.5rem 0;border-bottom:1px solid var(--p2l-line)}
   .section-block:last-of-type{border-bottom:none}
@@ -365,6 +370,18 @@
 
 </main>
 
+<div class="modal fade" id="preview-modal" tabindex="-1" aria-labelledby="preview-modal-title" aria-hidden="true">
+  <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title fs-5" id="preview-modal-title"></h2>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{transfer.cancel}}"></button>
+      </div>
+      <div class="modal-body p-0" id="preview-modal-body"></div>
+    </div>
+  </div>
+</div>
+
 <div class="modal fade" id="delete-modal" tabindex="-1" aria-labelledby="delete-modal-title" aria-describedby="delete-modal-message" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
@@ -402,6 +419,6 @@
 <script>window.P2L={{{p2l_config}}};document.getElementById('language-select').addEventListener('change',function(){location.href=this.dataset[this.value+'Url']+location.hash;});</script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-<script src="{{base_url}}/js/sync.js"></script>
+<script src="{{base_url}}/js/sync.js?v={{sync_js_version}}"></script>
 </body>
 </html>

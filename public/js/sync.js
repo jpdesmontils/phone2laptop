@@ -20,6 +20,9 @@
     countdown: document.getElementById('expiry-countdown'),
     expiryLabel: document.getElementById('expiry-label'),
     qr: document.getElementById('session-qr'),
+    previewModal: document.getElementById('preview-modal'),
+    previewModalTitle: document.getElementById('preview-modal-title'),
+    previewModalBody: document.getElementById('preview-modal-body'),
     deleteModal: document.getElementById('delete-modal'),
     deleteModalMessage: document.getElementById('delete-modal-message'),
     deleteModalConfirm: document.getElementById('delete-modal-confirm')
@@ -88,9 +91,68 @@
 
   const fileRows = new Map();
 
+  const previewModal = new bootstrap.Modal(elements.previewModal);
+
+  function fileIcon(type, name) {
+    if (type === 'application/pdf') return 'bi-file-earmark-pdf';
+    if (type.startsWith('video/')) return 'bi-file-earmark-play';
+    if (type.startsWith('audio/')) return 'bi-file-earmark-music';
+    if (type.startsWith('text/')) return 'bi-file-earmark-text';
+    if (/\.(zip|rar|7z|tar|gz)$/i.test(name)) return 'bi-file-earmark-zip';
+    return 'bi-file-earmark';
+  }
+
+  function showFilePreview(file, url) {
+    elements.previewModalTitle.textContent = message('previewTitle', { name: file.name });
+    let preview;
+    if (file.type.startsWith('image/')) {
+      preview = document.createElement('img');
+      preview.alt = file.name;
+    } else if (file.type.startsWith('video/')) {
+      preview = document.createElement('video');
+      preview.controls = true;
+    } else if (file.type.startsWith('audio/')) {
+      preview = document.createElement('audio');
+      preview.controls = true;
+    } else if (file.type === 'application/pdf' || file.type.startsWith('text/')) {
+      preview = document.createElement('iframe');
+      preview.title = file.name;
+    } else {
+      preview = document.createElement('div');
+      preview.className = 'document-preview-message d-flex flex-column align-items-center justify-content-center text-center p-4 text-body-secondary';
+      preview.innerHTML = `<i class="bi ${fileIcon(file.type, file.name)} fs-1 mb-3" aria-hidden="true"></i>`;
+      const text = document.createElement('p');
+      text.textContent = message('previewUnavailable');
+      preview.append(text);
+    }
+    if (preview instanceof HTMLImageElement || preview instanceof HTMLMediaElement || preview instanceof HTMLIFrameElement) {
+      preview.src = url;
+      preview.classList.add('document-preview');
+    }
+    elements.previewModalBody.replaceChildren(preview);
+    previewModal.show();
+  }
+
   function addFileRow(remote, file) {
+    const url = URL.createObjectURL(new Blob([file.content], { type: file.type }));
     const item = document.createElement('li');
     item.className = 'list-group-item d-flex justify-content-between align-items-center gap-3';
+    const previewButton = document.createElement('button');
+    previewButton.className = 'file-preview';
+    previewButton.type = 'button';
+    previewButton.setAttribute('aria-label', message('preview', { name: file.name }));
+    if (file.type.startsWith('image/')) {
+      const thumbnail = document.createElement('img');
+      thumbnail.src = url;
+      thumbnail.alt = '';
+      thumbnail.addEventListener('error', () => {
+        previewButton.innerHTML = `<i class="bi ${fileIcon(file.type, file.name)}" aria-hidden="true"></i>`;
+      }, { once: true });
+      previewButton.append(thumbnail);
+    } else {
+      previewButton.innerHTML = `<i class="bi ${fileIcon(file.type, file.name)}" aria-hidden="true"></i>`;
+    }
+    previewButton.addEventListener('click', () => showFilePreview(file, url));
     const label = document.createElement('div');
     label.className = 'flex-grow-1 text-truncate';
     const name = document.createElement('div');
@@ -108,12 +170,10 @@
     download.textContent = '↓';
     download.setAttribute('aria-label', message('download', { name: file.name }));
     download.addEventListener('click', () => {
-      const url = URL.createObjectURL(new Blob([file.content], { type: file.type }));
       const anchor = document.createElement('a');
       anchor.href = url;
       anchor.download = file.name;
       anchor.click();
-      setTimeout(() => URL.revokeObjectURL(url), 1000);
     });
     const remove = document.createElement('button');
     remove.className = 'btn btn-sm btn-outline-danger';
@@ -125,13 +185,14 @@
       async () => {
         await deleteFile(remote.id);
         item.remove();
+        URL.revokeObjectURL(url);
         fileRows.delete(remote.id);
       }
     ));
     actions.append(download, remove);
-    item.append(label, actions);
+    item.append(previewButton, label, actions);
     elements.list.append(item);
-    fileRows.set(remote.id, item);
+    fileRows.set(remote.id, { item, url });
   }
 
   let filesRefreshPromise = null;
@@ -141,9 +202,10 @@
     config.expiresAt = expiresAt ? Number(expiresAt) : null;
     const files = await response.json();
     const remoteIds = new Set(files.map(file => file.id));
-    fileRows.forEach((row, id) => {
+    fileRows.forEach((entry, id) => {
       if (!remoteIds.has(id)) {
-        row.remove();
+        entry.item.remove();
+        URL.revokeObjectURL(entry.url);
         fileRows.delete(id);
       }
     });
@@ -208,6 +270,7 @@
       method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ token: config.token, action: 'delete' })
     });
+    fileRows.forEach(entry => URL.revokeObjectURL(entry.url));
     elements.list.replaceChildren();
     fileRows.clear();
     elements.text.value = '';
