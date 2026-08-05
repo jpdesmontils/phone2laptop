@@ -230,8 +230,9 @@
   let lastText = '';
   async function loadText(key) {
     const payload = await (await api(`${config.apiBase}text.php?token=${encodeURIComponent(config.token)}`)).json();
-    if (!payload.ciphertext) return;
-    const clearText = decoder.decode(await decryptBytes(key, decodeBase64Url(payload.ciphertext)));
+    const clearText = payload.ciphertext
+      ? decoder.decode(await decryptBytes(key, decodeBase64Url(payload.ciphertext)))
+      : '';
     if (clearText !== lastText) {
       lastText = clearText;
       elements.text.value = clearText;
@@ -265,15 +266,23 @@
     config.expiresAt = result.expiresAt;
   }
 
-  async function deleteSession() {
+  async function clearSession() {
     await api(`${config.apiBase}close.php`, {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ token: config.token, action: 'delete' })
+      body: JSON.stringify({ token: config.token, action: 'clear' })
     });
     fileRows.forEach(entry => URL.revokeObjectURL(entry.url));
     elements.list.replaceChildren();
     fileRows.clear();
     elements.text.value = '';
+    lastText = '';
+  }
+
+  async function deleteSession() {
+    await api(`${config.apiBase}close.php`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token: config.token, action: 'delete' })
+    });
   }
 
   async function deleteFile(name) {
@@ -372,7 +381,7 @@
       sendFiles(Array.from(event.dataTransfer.files));
     });
     elements.copy.addEventListener('click', () => navigator.clipboard.writeText(elements.text.value));
-    elements.delete.addEventListener('click', () => showDeleteConfirmation(message('deleteConfirm'), deleteSession));
+    elements.delete.addEventListener('click', () => showDeleteConfirmation(message('deleteConfirm'), clearSession));
   }
 
   initialize().catch(error => {

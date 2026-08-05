@@ -58,6 +58,17 @@ if (!is_dir($dir)) {
 }
 
 switch ($action) {
+    case 'clear':
+        if (!delete_session_contents($dir)) {
+            http_response_code(500);
+            header('Content-Type: application/json');
+            echo json_encode(['error' => 'Impossible de vider la session']);
+            exit;
+        }
+        header('Content-Type: application/json');
+        echo json_encode(['ok' => true]);
+        break;
+
     case 'delete-file':
         $name = basename($payload['name'] ?? '');
         if (!preg_match('/^[a-f0-9-]{36}\.enc$/', $name)) {
