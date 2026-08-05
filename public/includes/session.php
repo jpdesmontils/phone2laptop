@@ -21,10 +21,17 @@ function session_dir(string $token): string
 function delete_session_directory(string $dir): bool
 {
     if (!is_dir($dir)) return true;
+    return delete_session_contents($dir, false) && rmdir($dir);
+}
+
+function delete_session_contents(string $dir, bool $preserveMetadata = true): bool
+{
+    if (!is_dir($dir)) return false;
     foreach (new FilesystemIterator($dir) as $entry) {
+        if ($preserveMetadata && $entry->getFilename() === '.session.json') continue;
         if (!$entry->isFile() || !unlink($entry->getPathname())) return false;
     }
-    return rmdir($dir);
+    return true;
 }
 
 function purge_expired_sessions()
